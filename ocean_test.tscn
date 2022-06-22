@@ -84,7 +84,10 @@ speed = 2.0
 enabled = true
 
 [node name="TestBoat" parent="." instance=ExtResource( 2 )]
-angular_damp = 6.597
-acceleration = 7
-buoyancy = 35
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.66473, -1.19397, 0 )
+angular_damp = 4.0
+acceleration = 3
+buoyancy = 40
 camera_yaw = true
+
+[editable path="TestBoat"]

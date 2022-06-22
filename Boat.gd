@@ -1,7 +1,9 @@
 extends RigidBody
 
-export (int) var acceleration = 10
-export (int) var steering_rate = 20
+export (int) var acceleration = 3
+export (float) var surf_angle = 0.03
+export (int) var surf_boost = 5
+export (int) var steering_rate = 10
 export (int) var buoyancy = 30
 
 # Camera export variables:
@@ -31,6 +33,10 @@ func _ready():
 func _input(event):
     if event is InputEventMouseMotion:
         _mouse_offset = event.relative
+
+    # quit
+    if event.is_action_pressed("ui_cancel"):
+        get_tree().quit()
 
 
 func _process(delta):
@@ -62,32 +68,44 @@ func _update_rotation(delta):
 
 
 func _physics_process(delta):
-
-    # move forward
-
     if is_in_water():
+        # accelerate
         if Input.is_action_pressed("ui_up"):
             add_central_force(global_transform.basis.xform(Vector3.RIGHT * acceleration))
+            # apply speed boost when going 'downhill' i.e. surfing
+            var angle = boat_angle()
+            if is_surfing(angle):
+                add_central_force(global_transform.basis.xform(Vector3.RIGHT * surf_boost))
+            elif is_climbing(angle):
+                add_central_force(global_transform.basis.xform(Vector3.LEFT * surf_boost))
 
-        #steer
+        # steer
         var direction = Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
         if direction != 0:
             add_torque(Vector3(0, steering_rate * direction, 0))
 
-    #quit
-    if Input.is_action_pressed("ui_cancel"):
-        get_tree().quit()
+
 
     apply_buoyancy()
     update_hud()
+
+func boat_angle():
+    return $stern.global_transform.origin.angle_to($bow.global_transform.origin)
+
+func is_surfing(angle):
+    if $bow.global_transform.origin.y < $stern.global_transform.origin.y:
+        return angle > surf_angle
+    return false
+
+func is_climbing(angle):
+    if $bow.global_transform.origin.y > $stern.global_transform.origin.y:
+        return angle > surf_angle
+    return false
 
 
 func is_in_water():
     var propeller_position = $propeller.global_transform.origin
     return propeller_position.y < WaveManager.get_wave_height(propeller_position)
-
-
-
 
 
 func apply_buoyancy():
@@ -115,6 +133,8 @@ func update_hud():
     text += "\nSOG: " + str(sog)
     text += "\nSTW: " + str(stw)
     text += "\nvelocity: " + str(linear_velocity)
+    text += "\nsurfing: " + str(is_surfing(boat_angle()))
+    text += "\nsurf angle: " + str($stern.global_transform.origin.angle_to($bow.global_transform.origin))
 
     Hud.get_children()[0].text = text
 

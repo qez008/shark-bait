@@ -1,0 +1,38 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type spatial;
+render_mode unshaded;
+
+const float PI = 3.14159265359;
+
+const vec2 DIR = vec2(1.0, 1.0);
+const float WAVE_LEN = .4;
+const float AMP = 0.04;
+const float SPEED = .1;
+const float GERSTNER_F = 0.7;
+
+
+float sineWave(float x, float freq, float amp) {
+    float height = sin(x * freq * PI) * amp;
+    return height;
+}
+
+void vertex() {
+    vec3 p = VERTEX.xyz;
+    float t = TIME;
+
+	float k = 2.0 * PI / WAVE_LEN;
+    float f = k * (p.x - SPEED * t);
+	p.y = AMP * sin(k * (p.x - SPEED * t));
+    // add-on for Gerstner wave
+    p.x += AMP * cos(f) * GERSTNER_F;
+    
+    // vertex normal
+    vec3 tangent = normalize(vec3(1, k * AMP * cos(f), 0));
+    vec3 normal = vec3(-tangent.y, tangent.x, 0);
+    
+	VERTEX.xyz = p;
+    NORMAL = normal;
+}
+"

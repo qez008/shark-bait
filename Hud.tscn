@@ -1,0 +1,14 @@
+[gd_scene format=2]
+
+[node name="Hud" type="CanvasLayer"]
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_left = 11.0
+margin_top = 12.0
+margin_right = 911.0
+margin_bottom = 173.0
+text = "Sample text"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}

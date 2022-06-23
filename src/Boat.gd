@@ -1,7 +1,8 @@
 extends RigidBody
 
 export (int) var acceleration = 3
-export (float) var surf_angle = 0.03
+export (float) var surf_angle = 0.027
+export (float) var climb_angle = 0.3
 export (int) var surf_boost = 5
 export (int) var steering_rate = 10
 export (int) var buoyancy = 30
@@ -76,6 +77,7 @@ func _physics_process(delta):
             var angle = boat_angle()
             if is_surfing(angle):
                 add_central_force(global_transform.basis.xform(Vector3.RIGHT * surf_boost))
+            # halt speed if climbing up a wave
             elif is_climbing(angle):
                 add_central_force(global_transform.basis.xform(Vector3.LEFT * surf_boost))
 
@@ -93,14 +95,10 @@ func boat_angle():
     return $stern.global_transform.origin.angle_to($bow.global_transform.origin)
 
 func is_surfing(angle):
-    if $bow.global_transform.origin.y < $stern.global_transform.origin.y:
-        return angle > surf_angle
-    return false
+    return $bow.global_transform.origin.y < $stern.global_transform.origin.y and angle > surf_angle
 
 func is_climbing(angle):
-    if $bow.global_transform.origin.y > $stern.global_transform.origin.y:
-        return angle > surf_angle
-    return false
+    return $bow.global_transform.origin.y > $stern.global_transform.origin.y and angle > climb_angle
 
 
 func is_in_water():

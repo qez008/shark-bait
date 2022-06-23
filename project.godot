@@ -11,13 +11,13 @@ config_version=4
 [application]
 
 config/name="Ocean"
-run/main_scene="res://ocean_test.tscn"
-config/icon="res://icon.png"
+run/main_scene="res://src/ocean_test.tscn"
+config/icon="res://assets/icon.png"
 
 [autoload]
 
-WaveManager="*res://wave_manager.gd"
-Hud="*res://Hud.tscn"
+WaveManager="*res://src/autoloads/wave_manager.gd"
+Hud="*res://src/autoloads/Hud.tscn"
 
 [display]
 

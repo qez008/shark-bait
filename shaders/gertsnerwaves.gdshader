@@ -14,7 +14,7 @@ uniform vec3 wave_d = vec3(0.0, 0.6, 0.3);
 uniform float synced_time = 0.0;
 
 
-const float PI = 3.14;
+const float PI = 3.141593;
 
 
 /*
@@ -51,9 +51,8 @@ vec3 wave(vec3 wave, float time, vec3 p, inout vec3 tangent, inout vec3 binormal
 }
 
 void vertex() {
-    float time = synced_time; //TIME;
-   // time = 0.0;
     
+    float time = synced_time;
     vec3 p = VERTEX.xyz;
     vec3 tangent = vec3(1, 0, 0);
     vec3 binormal = vec3(0, 0, 1);
@@ -64,6 +63,7 @@ void vertex() {
     p += wave(wave_d, time, VERTEX.xyz, tangent, binormal);
     
     vec3 normal = normalize(cross(binormal, tangent));
+    
     VERTEX.xyz = p;
     NORMAL = normal;
 }

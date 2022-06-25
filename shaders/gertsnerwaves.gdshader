@@ -68,11 +68,31 @@ void vertex() {
     NORMAL = normal;
 }
 
+float grid(vec2 uv, float batt) {
+    vec2 size = uv * 0.001;
+    uv += vec2(0.0, synced_time * 0.0 * (batt + 0.05));
+    uv = abs(fract(uv) - 0.5);
+    vec2 lines = smoothstep(size, vec2(0.0), uv);
+    lines += smoothstep(size * 5.0, vec2(0.0), uv) * 0.4 * batt;
+    return clamp(lines.x + lines.y, 0.0, 3.0);
+}
+
+
+
 void fragment() {
-    ALBEDO = vec3(0.0, 0.02, 0.1);
+//    ALBEDO = vec3(0.0, 0.02, 0.1);
 //    	ALPHA = 0.9;
-    ROUGHNESS = 0.0;
+//    ROUGHNESS = 0.0;
     
-//    vec4 albedo_tex = texture(texture_albedo, UV*texture_scale);
+//    vec4 albedo_tex = texture(texture_albedo, UV * texture_scale);
 //    ALBEDO = albedo_tex.rgb;
+
+    vec2 uv = UV * 50.0;
+    vec4 col = vec4(0.0, 0.1, 0.1, 1.0);
+//    uv.y = 3.0 / (abs(uv.y + 0.2) + 0.05);
+//    uv.x += -0.5;
+//    uv.x *= uv.y * 1.0;
+    float gridVal = grid(uv, 1.0);
+    col = mix(vec4(0.0, 0.1, 0.1, 1.0), vec4(0.0, 0.7, 1.0, 1.0), gridVal);
+    ALBEDO = col.rgb;
 }

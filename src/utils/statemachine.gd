@@ -5,18 +5,20 @@ export (Array, GDScript) var state_scripts = []
 
 var _states: Dictionary
 var _state: State
+var _time_in_state: float
 
 func _ready():
     for script in state_scripts:
-        var inst: State = script.new()
+        var inst: State = script.new(self)
         _states[inst.name] = inst
 
-    enter_state(_states[0])
+    enter_state(_states.values().front())
 
 
-func enter_state(next:State):
+func enter_state(next: State):
     _state = next
     _state._on_enter()
+    _time_in_state = 0.0
 
 
 func exit_state():
@@ -31,6 +33,7 @@ func transition(next: String):
 
 func _process(delta):
     _state._process(delta)
+    _time_in_state += delta
 
 
 func _physics_process(delta):
@@ -50,13 +53,22 @@ func _unhandled_key_input(event):
 
 
 
+func current_state() -> String:
+    return _state.name
+
+
+func time_in_state() -> float:
+    return _time_in_state
+
+
 
 
 class State:
-
+    var sm: StateMachine
     var name: String
 
-    func _init(name=""):
+    func _init(sm, name=""):
+        self.sm = sm
         self.name = name
 
 

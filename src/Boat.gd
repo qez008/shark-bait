@@ -1,4 +1,8 @@
+class_name Boat
 extends RigidBody
+
+# 1 m/s in knots
+const MS_TO_KNOTS = 1.94384449
 
 # Boat variables
 export (float) var acceleration = 3.0
@@ -29,10 +33,12 @@ var _total_pitch = 0.0
 
 
 
-
 func _ready():
     if camera_pitch or camera_yaw:
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+    for state in $state_machine._states.values():
+        state.body = self
 
 
 func _input(event):
@@ -46,6 +52,7 @@ func _input(event):
 
 func _process(delta):
     _update_rotation(delta)
+    update_hud()
 
 
 func _update_rotation(_delta):
@@ -68,10 +75,6 @@ func _update_rotation(_delta):
         $camera_rotor.rotate_object_local(Vector3(1,0,0), deg2rad(-_pitch))
 
 
-
-
-
-
 func _physics_process(_delta):
     if is_in_water():
         # accelerate
@@ -79,27 +82,27 @@ func _physics_process(_delta):
             add_central_force(global_transform.basis.xform(Vector3.RIGHT * acceleration))
             # apply speed boost when going 'downhill' i.e. surfing
             var angle = boat_angle()
-            if is_surfing(angle):
-                add_central_force(global_transform.basis.xform(Vector3.RIGHT * surf_boost))
-            # halt speed if climbing up a wave
-            elif is_climbing(angle):
-                add_central_force(global_transform.basis.xform(Vector3.LEFT * climb_friction))
+#            if is_surfing(angle):
+#                add_central_force(global_transform.basis.xform(Vector3.RIGHT * surf_boost))
+#            # halt speed if climbing up a wave
+#            elif is_climbing(angle):
+#                add_central_force(global_transform.basis.xform(Vector3.LEFT * climb_friction))
 
         # steer
         var direction = Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
         if direction != 0:
             add_torque(Vector3(0, steering_rate * direction, 0))
 
-
-
     apply_buoyancy()
-    update_hud()
+
 
 func boat_angle():
-    return $stern.global_transform.origin.angle_to($bow.global_transform.origin)
+    return self.rotation.z
+
 
 func is_surfing(angle):
     return $bow.global_transform.origin.y < $stern.global_transform.origin.y and angle > surf_angle
+
 
 func is_climbing(angle):
     return $bow.global_transform.origin.y > $stern.global_transform.origin.y and angle > climb_angle
@@ -121,25 +124,12 @@ func apply_buoyancy():
 
 
 func update_hud():
-    var y_boat = global_transform.origin.y
-    var y_wave = WaveManager.get_wave_height(global_transform.origin)
-
-    #speeds
-    var speed = abs(linear_velocity.length())
-    var sog = abs(Vector2(linear_velocity.x, linear_velocity.z).length())
-
-
-    var text = "boat y: " + str(y_boat)
-    text += "\nwave y: " + str(y_wave)
-    text += "\nunder water: " + str(y_boat < y_wave)
-    text += "\nspeed: " + str(speed)
-    text += "\nSOG: " + str(sog)
-    text += "\nvelocity: " + str(linear_velocity)
-    text += "\nsurfing: " + str(is_surfing(boat_angle()))
-    text += "\nboat angle: " + str(boat_angle())
+    var text = ""
+    text += "\nspeed: %.1f" % abs(linear_velocity.length())
+    text += "\nSOG: %.1f" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
+    text += "\nboat angle: %.2f" % boat_angle()
 
     Hud.get_children()[0].text = text
-
 
 
 func set_smoothness(value):

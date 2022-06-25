@@ -8,6 +8,7 @@ var _wave_B: Vector3
 var _wave_C: Vector3
 var _wave_D: Vector3
 
+
 func _process(delta):
     _time += delta
 
@@ -18,12 +19,14 @@ func set_waves(a, b, c, d):
     _wave_C = c
     _wave_D = d
 
+
 func get_wave_time() -> float:
     return _time
 
 
 func get_wave_height(target):
     var p = target
+
     for _i in range(0, 3):
         p = _get_wave_height(p.x, p.z)
         var diff = p - target

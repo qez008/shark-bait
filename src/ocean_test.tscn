@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://shaders/gertsnerwaves.gdshader" type="Shader" id=1]
-[ext_resource path="res://src/TestBoat.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/utils/TestBoat.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/textures/JS-dotGrid-2022-06-22-15-56-13.png" type="Texture" id=3]
 [ext_resource path="res://src/waves.gd" type="Script" id=4]
 [ext_resource path="res://src/floater.gd" type="Script" id=5]
@@ -85,7 +85,7 @@ enabled = true
 
 [node name="TestBoat" parent="." instance=ExtResource( 2 )]
 angular_damp = 4.0
-buoyancy = 40
+steering_rate = 10.0
 camera_yaw = true
 
 [editable path="TestBoat"]

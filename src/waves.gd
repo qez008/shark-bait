@@ -11,7 +11,7 @@ func _ready():
         _shader_mat.get_shader_param("wave_d")
     )
 
-func _process(delta):
+func _process(_delta):
 #    if _shader_mat == null:
 #        _shader_mat = self.get_active_material(0)
 

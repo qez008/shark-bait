@@ -1,5 +1,25 @@
 extends Node
 
+signal update_wave_config
+
+# wave configurations:
+
+var quiet_waves = [
+        Vector3(0.0, 1.0, 0.0),
+        Vector3(0.0, 1.0, 0.0),
+        Vector3(0.0, 1.0, 0.0),
+        Vector3(0.0, 1.0, 0.0)
+   ]
+
+var medium_waves = [
+        Vector3(1.61, 74.956, 0.116),
+        Vector3(1.994, 36.31, 0.156),
+        Vector3(1.226, 21.954, 0.152),
+        Vector3(1.508, 12.934, 0.212)
+   ]
+
+
+# state:
 
 var _time: float = 0.0
 
@@ -9,8 +29,21 @@ var _wave_C: Vector3
 var _wave_D: Vector3
 
 
+
 func _process(delta):
     _time += delta
+
+
+func _unhandled_input(event):
+    if event.is_action_pressed("one"):
+        set_wave_config(quiet_waves)
+    if event.is_action_pressed("two"):
+        set_wave_config(medium_waves)
+
+
+func set_wave_config(config):
+    callv("set_waves", config)
+    emit_signal("update_wave_config", config)
 
 
 func set_waves(a, b, c, d):
@@ -66,3 +99,4 @@ func wave(w: Vector3, time, p: Vector3) -> Vector3:
         a * sin(f),
         d.y * (a * cos(f))
     )
+

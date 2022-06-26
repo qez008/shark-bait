@@ -1,34 +1,22 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://shaders/gertsnerwaves.gdshader" type="Shader" id=1]
 [ext_resource path="res://src/test_boat/TestBoat.tscn" type="PackedScene" id=2]
-[ext_resource path="res://assets/textures/JS-dotGrid-2022-06-22-15-56-13.png" type="Texture" id=3]
 [ext_resource path="res://src/waves.gd" type="Script" id=4]
 [ext_resource path="res://src/floater.gd" type="Script" id=5]
 
 [sub_resource type="ShaderMaterial" id=11]
 shader = ExtResource( 1 )
-shader_param/texture_scale = Vector2( 20, 20 )
 shader_param/wave_a = Vector3( 1.61, 74.956, 0.116 )
 shader_param/wave_b = Vector3( 1.994, 36.31, 0.156 )
 shader_param/wave_c = Vector3( 1.266, 21.954, 0.152 )
 shader_param/wave_d = Vector3( 1.508, 12.934, 0.212 )
 shader_param/synced_time = 0.0
-shader_param/texture_albedo = ExtResource( 3 )
+shader_param/wave_offset = Vector3( 0, 0, 0 )
 
 [sub_resource type="PlaneMesh" id=3]
 material = SubResource( 11 )
-size = Vector2( 200, 200 )
-subdivide_width = 200
-subdivide_depth = 200
-
-[sub_resource type="SpatialMaterial" id=12]
-flags_unshaded = true
-albedo_color = Color( 0, 0, 0, 1 )
-
-[sub_resource type="PlaneMesh" id=13]
-material = SubResource( 12 )
-size = Vector2( 100, 100 )
+size = Vector2( 300, 300 )
 subdivide_width = 200
 subdivide_depth = 200
 
@@ -42,11 +30,6 @@ height = 0.4
 mesh = SubResource( 3 )
 material/0 = null
 script = ExtResource( 4 )
-
-[node name="ocean_floor" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11.9906, 0 )
-mesh = SubResource( 13 )
-material/0 = null
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.532256, 0.846583, 0, -0.846583, 0.532256, 0, 3.1185, 1.58938 )

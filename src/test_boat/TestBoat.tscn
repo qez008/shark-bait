@@ -58,6 +58,12 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.02008, 0, 0 )
 [node name="camera_target" type="Spatial" parent="camera_rotor"]
 transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.60253, 3.51384, 0 )
 
+[node name="right_target" type="Spatial" parent="camera_rotor"]
+transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 3.514, 2 )
+
+[node name="left_target" type="Spatial" parent="camera_rotor"]
+transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 3.514, -2 )
+
 [node name="propeller" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.419213, -0.283934, 0 )
 

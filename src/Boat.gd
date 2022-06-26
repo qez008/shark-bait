@@ -40,6 +40,8 @@ func _ready():
     for state in $state_machine._states.values():
         state.body = self
 
+    $camera_rotor/camera_target.transform.origin = $camera_rotor/right_target.transform.origin
+
 
 func _input(event):
     if event is InputEventMouseMotion:
@@ -94,6 +96,7 @@ func _physics_process(_delta):
             add_torque(Vector3(0, steering_rate * direction, 0))
 
     apply_buoyancy()
+    WaveManager.set_wave_offset(global_transform.origin.x, global_transform.origin.z)
 
 
 func boat_angle():

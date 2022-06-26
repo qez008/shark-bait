@@ -1,6 +1,7 @@
 extends Node
 
 signal update_wave_config
+signal update_wave_offset
 
 # wave configurations:
 
@@ -28,6 +29,8 @@ var _wave_B: Vector3
 var _wave_C: Vector3
 var _wave_D: Vector3
 
+var _wave_offset: Vector3
+
 
 
 func _process(delta):
@@ -51,6 +54,11 @@ func set_waves(a, b, c, d):
     _wave_B = b
     _wave_C = c
     _wave_D = d
+
+
+func set_wave_offset(x, z):
+    _wave_offset = Vector3(x, 0.0, z)
+    emit_signal("update_wave_offset", _wave_offset)
 
 
 func get_wave_time() -> float:

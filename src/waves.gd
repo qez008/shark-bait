@@ -12,7 +12,8 @@ func _ready():
         _shader_mat.get_shader_param("wave_d")
     )
 
-    WaveManager.connect("update_wave_config", self, "set_waves")
+    var _s1 = WaveManager.connect("update_wave_config", self, "set_waves")
+    var _s2 = WaveManager.connect("update_wave_offset", self, "set_wave_offset")
 
 
 func _process(_delta):
@@ -24,3 +25,8 @@ func set_waves(wave_config: Array):
     _shader_mat.set_shader_param("wave_b", wave_config[1])
     _shader_mat.set_shader_param("wave_c", wave_config[2])
     _shader_mat.set_shader_param("wave_d", wave_config[3])
+
+
+func set_wave_offset(offset: Vector3):
+    _shader_mat.set_shader_param("wave_offset", offset)
+    self.global_transform.origin = offset

@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode vertex_lighting;
 
+uniform vec4 grid_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
+uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
 
 // angle, speed, wave length, steepness:
 uniform vec3 wave_a = vec3(0.0, 2.1, 0.2);
@@ -84,11 +86,26 @@ float line(vec2 uv, float batt) {
 }
 
 
-void fragment() {
+vec4 lines(vec2 uv) {
     vec2 offset = wave_offset.xz / 300.0;
-    vec2 uv = (offset + UV) * 100.0;
-    vec4 col = vec4(0.0, 0.1, 0.1, 1.0);
+    uv = (offset + uv) * 100.0;
+    vec4 col = fill_color;
     float gridVal = line(uv, 1.0);
-    col = mix(vec4(0.0, 0.1, 0.1, 1.0), vec4(0.0, 0.7, 1.0, 1.0), gridVal);
-    ALBEDO = col.rgb;
+    col = mix(fill_color, grid_color, gridVal);
+    return col;
+}
+
+float circle(vec2 _st, float _radius){
+    vec2 pos = vec2(0.5) - _st;
+    return smoothstep(1.0 - _radius, 1.0 - _radius + _radius * 0.2, 1.0 - dot(pos, pos) * PI);
+}
+
+
+void fragment() {
+//    vec2 st = fract(UV * 1000.0);
+//    vec3 color = vec3(1.0 - circle(st, 0.3));
+//    ALBEDO = color;
+    vec4 color = lines(UV);
+    ALBEDO = color.rgb;
+//    ALPHA = color.a;
 }

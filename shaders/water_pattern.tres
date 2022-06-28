@@ -1,0 +1,29 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type spatial;
+render_mode vertex_lighting;
+
+uniform sampler2D noise_pattern;
+uniform float noise_scale = 30.0;
+
+uniform vec4 fill_color : hint_color = vec4(vec3(0.1), 1.0);
+uniform vec4 line_color : hint_color = vec4(vec3(0.5), 1.0);
+
+
+float surf(vec2 uv, float time) {
+    float noise = texture(noise_pattern, vec2(uv.x, uv.y)).x;
+    noise = fract(noise * 6.0);
+    float pixelNoiseChange = fwidth(noise);
+    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise);
+    heightLine += smoothstep(pixelNoiseChange, 0, noise);
+    
+    return heightLine;
+   }
+
+void fragment() {
+    float surf = surf(UV * noise_scale, TIME);
+    vec4 color = (1.0 - surf) * fill_color + surf * line_color;
+    ALBEDO = color.xyz;
+}
+"

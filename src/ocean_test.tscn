@@ -1,21 +1,27 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://shaders/gertsnerwaves.gdshader" type="Shader" id=1]
 [ext_resource path="res://src/test_boat/TestBoat.tscn" type="PackedScene" id=2]
-[ext_resource path="res://shaders/water_pattern.tres" type="Shader" id=3]
+[ext_resource path="res://shaders/wave_pattern.gdshader" type="Shader" id=3]
 [ext_resource path="res://src/waves.gd" type="Script" id=4]
 [ext_resource path="res://src/floater.gd" type="Script" id=5]
+[ext_resource path="res://shaders/inception_shader.gdshader" type="Shader" id=6]
+
+[sub_resource type="ViewportTexture" id=25]
+viewport_path = NodePath("Viewport")
 
 [sub_resource type="ShaderMaterial" id=11]
+resource_local_to_scene = true
 shader = ExtResource( 1 )
-shader_param/grid_color = Color( 0, 0.7, 1, 1 )
-shader_param/fill_color = Color( 0.0745098, 0.0745098, 0.0745098, 1 )
+shader_param/line_color = Color( 0.243137, 0.792157, 0.741176, 1 )
+shader_param/fill_color = Color( 0.101961, 0.254902, 0.392157, 1 )
 shader_param/wave_a = Vector3( 1.61, 74.956, 0.116 )
 shader_param/wave_b = Vector3( 1.994, 36.31, 0.156 )
 shader_param/wave_c = Vector3( 1.266, 21.954, 0.152 )
 shader_param/wave_d = Vector3( 1.508, 12.934, 0.212 )
 shader_param/synced_time = 0.0
 shader_param/wave_offset = Vector3( 0, 0, 0 )
+shader_param/noise_pattern = SubResource( 25 )
 
 [sub_resource type="PlaneMesh" id=3]
 material = SubResource( 11 )
@@ -23,150 +29,82 @@ size = Vector2( 300, 300 )
 subdivide_width = 200
 subdivide_depth = 200
 
+[sub_resource type="SpatialMaterial" id=29]
+albedo_color = Color( 0.027451, 0.14902, 0.290196, 1 )
+
+[sub_resource type="PlaneMesh" id=28]
+material = SubResource( 29 )
+size = Vector2( 300, 300 )
+subdivide_width = 10
+subdivide_depth = 10
+
 [sub_resource type="SphereMesh" id=6]
 radius = 0.2
 height = 0.4
 
-[sub_resource type="ViewportTexture" id=20]
+[sub_resource type="ViewportTexture" id=23]
 viewport_path = NodePath("Viewport")
 
-[sub_resource type="OpenSimplexNoise" id=16]
-period = 32.0
-persistence = 0.1
-
-[sub_resource type="NoiseTexture" id=17]
-width = 256
-height = 1
-seamless = true
-noise = SubResource( 16 )
-
-[sub_resource type="ShaderMaterial" id=15]
+[sub_resource type="ShaderMaterial" id=24]
 resource_local_to_scene = true
 shader = ExtResource( 3 )
-shader_param/fill_color = Color( 0.156863, 0.341176, 0.4, 1 )
-shader_param/line_color = Color( 0.168627, 0.788235, 0.701961, 1 )
-shader_param/noise_pattern = SubResource( 17 )
-shader_param/nTexture = SubResource( 20 )
+shader_param/fill_color = Color( 0.152941, 0.305882, 0.447059, 1 )
+shader_param/line_color = Color( 0.133333, 0.741176, 0.698039, 1 )
+shader_param/noise_pattern = SubResource( 23 )
 
 [sub_resource type="QuadMesh" id=13]
-material = SubResource( 15 )
+material = SubResource( 24 )
 size = Vector2( 40, 40 )
 
-[sub_resource type="Shader" id=18]
-code = "shader_type canvas_item;
-render_mode unshaded;
+[sub_resource type="OpenSimplexNoise" id=26]
 
-
-// Author @patriciogv - 2015
-// http://patriciogonzalezvivo.com
-
-uniform sampler2D noisetex;
-uniform int NUM_OCTAVES = 5;
-uniform vec2 u_resolution;
-
-float random (in vec2 _st) {
-    return fract(sin(dot(_st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-}
-
-// Based on Morgan McGuire @morgan3d
-// https://www.shadertoy.com/view/4dS3Wd
-float noise (in vec2 _st) {
-    vec2 i = floor(_st);
-    vec2 f = fract(_st);
-
-    // Four corners in 2D of a tile
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(a, b, u.x) +
-            (c - a)* u.y * (1.0 - u.x) +
-            (d - b) * u.x * u.y;
-}
-
-
-float fbm ( in vec2 _st) {
-    float v = 0.0;
-    float a = 0.5;
-    vec2 shift = vec2(100.0);
-    // Rotate to reduce axial bias
-    mat2 rot = mat2( vec2(cos(0.5), sin(0.5)) , vec2(-sin(0.5), cos(0.50)) );
-    for (int i = 0; i < NUM_OCTAVES; ++i) {
-        v += a * noise(_st);
-        _st = rot * _st * 2.0 + shift;
-        a *= 0.5;
-    }
-    return v;
-}
-
-void fragment() {
-    vec2 st = UV / u_resolution.xy * 3.0;
-    vec3 color = vec3(0.0);
-
-    vec2 q = vec2(0.);
-    q.x = fbm( st + 0.00 * TIME);
-    q.y = fbm( st + vec2(1.0));
-
-    vec2 r = vec2(0.);
-    r.x = fbm( st + 1.0 * q + vec2(1.7,9.2) + 0.15 * TIME);
-    r.y = fbm( st + 1.0 * q + vec2(8.3,2.8) + 0.126 * TIME);
-
-    float f = fbm(st+r);
-
-    color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
-    color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
-//    color = mix( color, vec3(0.666667, 1.0, 1.0), clamp(abs(r.x), 0.0, 1.0) );
-    color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
-    
-    COLOR = vec4((f*f*f+.6*f*f+.5*f) * color, 1.0);
-}"
-
-[sub_resource type="OpenSimplexNoise" id=21]
-
-[sub_resource type="NoiseTexture" id=22]
+[sub_resource type="NoiseTexture" id=27]
+height = 1
 seamless = true
-noise = SubResource( 21 )
+noise = SubResource( 26 )
 
-[sub_resource type="ShaderMaterial" id=19]
-shader = SubResource( 18 )
-shader_param/NUM_OCTAVES = 5
-shader_param/u_resolution = null
-shader_param/noisetex = SubResource( 22 )
+[sub_resource type="ShaderMaterial" id=22]
+shader = ExtResource( 6 )
+shader_param/NUM_OCTAVES = 3
+shader_param/u_resolution = Vector2( 3, 3 )
+shader_param/noise_tex = SubResource( 27 )
 
 [node name="ocean_test" type="Spatial"]
 
-[node name="ocean_mesh" type="MeshInstance" parent="."]
+[node name="ocean_surface" type="MeshInstance" parent="."]
 mesh = SubResource( 3 )
 material/0 = null
 script = ExtResource( 4 )
 
+[node name="ocean_floor" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11.772, 0 )
+visible = false
+mesh = SubResource( 28 )
+material/0 = null
+
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.532256, 0.846583, 0, -0.846583, 0.532256, 0, 3.1185, 1.58938 )
-light_energy = 0.371
 
 [node name="floater" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 27.9987, 0, -0.809572 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 7.21186, 0, 6.60928 )
 mesh = SubResource( 6 )
 material/0 = null
 script = ExtResource( 5 )
 
 [node name="floater2" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 29.6816, 0, -0.809572 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.89477, 0, 6.60928 )
 mesh = SubResource( 6 )
 material/0 = null
 script = ExtResource( 5 )
 
 [node name="floater3" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 27.9987, 0, 0.87098 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 7.21186, 0, 8.28983 )
 mesh = SubResource( 6 )
 material/0 = null
 script = ExtResource( 5 )
 
 [node name="floater4" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 29.6816, 0, 0.87098 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.89477, 0, 8.28983 )
 mesh = SubResource( 6 )
 material/0 = null
 script = ExtResource( 5 )
@@ -184,17 +122,18 @@ angular_damp = 4.0
 camera_yaw = true
 
 [node name="test_mesh" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.012007, 3.61504, -0.679625 )
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.012007, 2.61439, -0.679625 )
+visible = false
 mesh = SubResource( 13 )
 material/0 = null
 
 [node name="Viewport" type="Viewport" parent="."]
 size = Vector2( 512, 512 )
 hdr = false
-usage = 0
+disable_3d = true
 
 [node name="ColorRect" type="ColorRect" parent="Viewport"]
-material = SubResource( 19 )
+material = SubResource( 22 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 40.0

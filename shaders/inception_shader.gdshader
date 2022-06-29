@@ -5,8 +5,9 @@ render_mode unshaded;
 // Author @patriciogv - 2015
 // http://patriciogonzalezvivo.com
 
-uniform int NUM_OCTAVES = 5;
-uniform vec2 u_resolution;
+uniform int NUM_OCTAVES = 3;
+uniform vec2 u_resolution = vec2(1.0);
+uniform sampler2D noise_tex;
 
 float random (in vec2 _st) {
     return fract(sin(dot(_st.xy, vec2(12.9898,78.233))) * 43758.5453123);
@@ -15,6 +16,8 @@ float random (in vec2 _st) {
 // Based on Morgan McGuire @morgan3d
 // https://www.shadertoy.com/view/4dS3Wd
 float noise (in vec2 _st) {
+//    return texture(noise_tex, _st).x;
+    
     vec2 i = floor(_st);
     vec2 f = fract(_st);
 
@@ -62,8 +65,8 @@ void fragment() {
 
     color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
     color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
-//    color = mix( color, vec3(0.666667, 1.0, 1.0), clamp(abs(r.x), 0.0, 1.0) );
     color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
     
-    COLOR = vec4((f*f*f+.6*f*f+.5*f) * color, 1.0);
+//    COLOR = vec4( (f*f*f + .6*f*f + .5*f) * color , 1.0 );
+    COLOR = vec4( f * color , 1.0 );
 }

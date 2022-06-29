@@ -1,8 +1,10 @@
 shader_type spatial;
-render_mode vertex_lighting;
+render_mode blend_add, unshaded;
 
-uniform vec4 grid_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
+uniform vec4 line_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
 uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
+
+uniform sampler2D noise_pattern;
 
 // angle, speed, wave length, steepness:
 uniform vec3 wave_a = vec3(0.0, 2.1, 0.2);
@@ -12,6 +14,7 @@ uniform vec3 wave_d = vec3(0.0, 0.6, 0.3);
 
 uniform float synced_time = 0.0;
 uniform vec3 wave_offset = vec3(0.0, 0.0, 0.0);
+
 
 const float PI = 3.141593;
 
@@ -68,14 +71,22 @@ void vertex() {
     NORMAL = normal;
 }
 
-float grid(vec2 uv, float batt) {
-    vec2 size = vec2(0.02);
-//    uv += vec2(0.0, batt + 0.05);
-    uv = abs(fract(uv) - 0.5);
-    vec2 lines = smoothstep(size, vec2(0.0), uv);
-    lines += smoothstep(size * 5.0, vec2(0.0), uv) * 0.4 * batt;
-    return clamp(lines.x + lines.y, 0.0, 3.0);
+// https://www.ronja-tutorials.com/post/026-perlin-noise/
+float surf(vec2 uv) {
+    float noise = texture(noise_pattern, uv).x;
+    noise = fract(noise * 20.0);
+    float pixelNoiseChange = fwidth(noise);
+    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise);
+    heightLine += smoothstep(pixelNoiseChange, 0.0, noise);
+    
+    return heightLine;
 }
+
+const vec3 P1ColorIn = vec3(1.0, 0.5, 0.0);
+const vec3 P1ColorOut = vec3(1.0, 0.0, 0.0);
+
+const vec3 P2ColorIn = vec3(0.0, 0.5, 1.0);  //vec3(1.0, 1.0, 1.0);
+const vec3 P2ColorOut = vec3(0.0, 0.0, 1.0); //vec3(0.0, 0.5, 1.0);
 
 float line(vec2 uv, float batt) {
     vec2 size = vec2(0.02);
@@ -89,23 +100,46 @@ float line(vec2 uv, float batt) {
 vec4 lines(vec2 uv) {
     vec2 offset = wave_offset.xz / 300.0;
     uv = (offset + uv) * 100.0;
+
     vec4 col = fill_color;
     float gridVal = line(uv, 1.0);
-    col = mix(fill_color, grid_color, gridVal);
+    col = mix(fill_color, line_color, gridVal);
     return col;
 }
 
-float circle(vec2 _st, float _radius){
-    vec2 pos = vec2(0.5) - _st;
-    return smoothstep(1.0 - _radius, 1.0 - _radius + _radius * 0.2, 1.0 - dot(pos, pos) * PI);
+float grid(vec2 uv, float batt) {
+    vec2 size = vec2(0.02);
+//    uv += vec2(0.0, batt + 0.05);
+    uv = abs(fract(uv) - 0.5);
+    vec2 lines = smoothstep(size, vec2(0.0), uv);
+    lines += smoothstep(size * 5.0, vec2(0.0), uv) * 0.4 * batt;
+    return clamp(lines.x + lines.y, 0.0, 3.0);
 }
 
+float circle(in vec2 _st, in float _radius) {
+    vec2 dist = _st-vec2(0.5);
+	return 1.-smoothstep(_radius-(_radius*0.01),
+                         _radius+(_radius*0.01),
+                         dot(dist,dist)*4.0);
+}
 
 void fragment() {
-//    vec2 st = fract(UV * 1000.0);
-//    vec3 color = vec3(1.0 - circle(st, 0.3));
-//    ALBEDO = color;
+//    float surf = surf(UV);
+//    vec4 color = (1.0 - surf) * fill_color + surf * line_color;
+//    ALBEDO = color.xyz;
+
+//    vec2 uv = wave_offset.xz / 100.;
+//    uv = vec2(mod(uv.x, 1.), mod(uv.y*20., 1.));
+//    float curve = 0.1 * sin((9.25 * uv.x) + (2.0 * TIME));
+//    float lineAShape = smoothstep(1.0 - clamp(abs(curve + uv.y - 0.5) * 8.0, 0.0, 1.0), 1.0, 0.99);
+//    vec3  lineACol = (1.0 - lineAShape) * vec3(mix(P1ColorIn, P1ColorOut, lineAShape));
+//
+//    ALBEDO = lineACol;
+//    vec2 offset = wave_offset.xz / 100.0;
+//    vec2 uv = (offset + UV);
     vec4 color = lines(UV);
+    vec2 p = (UV - 0.5);
+    float reverse_distance = 0.4 - distance(p, vec2(0.0));
+    color *= vec4(clamp( reverse_distance*2. , 0.0 , 1.0 ));
     ALBEDO = color.rgb;
-//    ALPHA = color.a;
 }

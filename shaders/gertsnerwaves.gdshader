@@ -82,11 +82,6 @@ float surf(vec2 uv) {
     return heightLine;
 }
 
-const vec3 P1ColorIn = vec3(1.0, 0.5, 0.0);
-const vec3 P1ColorOut = vec3(1.0, 0.0, 0.0);
-
-const vec3 P2ColorIn = vec3(0.0, 0.5, 1.0);  //vec3(1.0, 1.0, 1.0);
-const vec3 P2ColorOut = vec3(0.0, 0.0, 1.0); //vec3(0.0, 0.5, 1.0);
 
 float line(vec2 uv, float batt) {
     vec2 size = vec2(0.02);
@@ -107,39 +102,23 @@ vec4 lines(vec2 uv) {
     return col;
 }
 
-float grid(vec2 uv, float batt) {
-    vec2 size = vec2(0.02);
-//    uv += vec2(0.0, batt + 0.05);
-    uv = abs(fract(uv) - 0.5);
-    vec2 lines = smoothstep(size, vec2(0.0), uv);
-    lines += smoothstep(size * 5.0, vec2(0.0), uv) * 0.4 * batt;
-    return clamp(lines.x + lines.y, 0.0, 3.0);
-}
-
-float circle(in vec2 _st, in float _radius) {
-    vec2 dist = _st-vec2(0.5);
-	return 1.-smoothstep(_radius-(_radius*0.01),
-                         _radius+(_radius*0.01),
-                         dot(dist,dist)*4.0);
-}
 
 void fragment() {
-//    float surf = surf(UV);
-//    vec4 color = (1.0 - surf) * fill_color + surf * line_color;
-//    ALBEDO = color.xyz;
-
-//    vec2 uv = wave_offset.xz / 100.;
-//    uv = vec2(mod(uv.x, 1.), mod(uv.y*20., 1.));
-//    float curve = 0.1 * sin((9.25 * uv.x) + (2.0 * TIME));
-//    float lineAShape = smoothstep(1.0 - clamp(abs(curve + uv.y - 0.5) * 8.0, 0.0, 1.0), 1.0, 0.99);
-//    vec3  lineACol = (1.0 - lineAShape) * vec3(mix(P1ColorIn, P1ColorOut, lineAShape));
-//
-//    ALBEDO = lineACol;
-//    vec2 offset = wave_offset.xz / 100.0;
-//    vec2 uv = (offset + UV);
+//    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    
+    vec2 offset = wave_offset.xz / 100.0;
+    vec2 uv = (offset + UV);
     vec4 color = lines(UV);
     vec2 p = (UV - 0.5);
     float reverse_distance = 0.4 - distance(p, vec2(0.0));
     color *= vec4(clamp( reverse_distance*2. , 0.0 , 1.0 ));
+    
     ALBEDO = color.rgb;
+    
+//    float depth = texture(DEPTH_TEXTURE, SCREEN_UV).x;
+//    depth = depth * 2.0 - 1.0;
+//    depth = PROJECTION_MATRIX[3][2] / (depth + PROJECTION_MATRIX[2][2]);
+//    depth = depth + VERTEX.z;
+//    depth = exp(-depth * 0.2);
+//    ALPHA = clamp(1.0 - depth, 0.0, 1.0);
 }

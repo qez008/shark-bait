@@ -49,6 +49,15 @@ float fbm ( in vec2 _st) {
     return v;
 }
 
+vec3 lines(float noise_val) {
+    noise_val = fract(noise_val * 20.0);
+    float pixelNoiseChange = 0.1;
+    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise_val);
+    heightLine += smoothstep(pixelNoiseChange, 0.0, noise_val);
+    
+    return vec3(heightLine);    
+}
+
 void fragment() {
     vec2 st = UV / u_resolution.xy * 3.0;
     vec3 color = vec3(0.0);
@@ -68,5 +77,5 @@ void fragment() {
     color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
     
 //    COLOR = vec4( (f*f*f + .6*f*f + .5*f) * color , 1.0 );
-    COLOR = vec4( f * color , 1.0 );
+    COLOR = vec4( lines(f) , 1.0 );
 }

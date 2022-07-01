@@ -59,6 +59,8 @@ func set_waves(a, b, c, d):
 
 
 func set_wave_offset(x, z):
+    var cell_size = 15
+#    _wave_offset = Vector3(x - (x % cell_size), 0.0, z - (z % cell_size))
     _wave_offset = Vector3(x, 0.0, z)
     emit_signal("update_wave_offset", _wave_offset)
 

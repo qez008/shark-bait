@@ -1,19 +1,23 @@
 extends MeshInstance
 
+export var is_master = false
+
 var _shader_mat: ShaderMaterial
 
 
 func _ready():
     _shader_mat = self.get_active_material(0)
-    WaveManager.set_waves(
-        _shader_mat.get_shader_param("wave_a"),
-        _shader_mat.get_shader_param("wave_b"),
-        _shader_mat.get_shader_param("wave_c"),
-        _shader_mat.get_shader_param("wave_d")
-    )
 
     var _s1 = WaveManager.connect("update_wave_config", self, "set_waves")
     var _s2 = WaveManager.connect("update_wave_offset", self, "set_wave_offset")
+
+    if is_master:
+        WaveManager.set_waves(
+            _shader_mat.get_shader_param("wave_a"),
+            _shader_mat.get_shader_param("wave_b"),
+            _shader_mat.get_shader_param("wave_c"),
+            _shader_mat.get_shader_param("wave_d")
+        )
 
 
 func _process(_delta):

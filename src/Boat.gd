@@ -96,7 +96,6 @@ func _physics_process(_delta):
             add_torque(Vector3(0, steering_rate * direction, 0))
 
     apply_buoyancy()
-    WaveManager.set_wave_offset(global_transform.origin.x, global_transform.origin.z)
 
 
 func boat_angle():

@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[sub_resource type="Shader" id=34]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D noise_tex;
+
+
+void fragment() {
+    float noise_val = texture(noise_tex, UV).x;
+    noise_val = fract(noise_val * 20.0);
+    float pixelNoiseChange = 0.1;
+    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise_val);
+    heightLine += smoothstep(pixelNoiseChange, 0.0, noise_val);
+    
+    ALBEDO = vec3(heightLine);
+}"
+
+[sub_resource type="ViewportTexture" id=36]
+viewport_path = NodePath("Viewport")
+
+[resource]
+resource_local_to_scene = true
+shader = SubResource( 34 )
+shader_param/noise_tex = SubResource( 36 )

@@ -1,11 +1,11 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://shaders/gertsnerwaves.gdshader" type="Shader" id=1]
 [ext_resource path="res://src/test_boat/TestBoat.tscn" type="PackedScene" id=2]
-[ext_resource path="res://shaders/wave_pattern.gdshader" type="Shader" id=3]
+[ext_resource path="res://src/ocean_test.gd" type="Script" id=3]
 [ext_resource path="res://src/waves.gd" type="Script" id=4]
 [ext_resource path="res://src/floater.gd" type="Script" id=5]
-[ext_resource path="res://shaders/inception_shader.gdshader" type="Shader" id=6]
+[ext_resource path="res://shaders/detailed_water_surface.gdshader" type="Shader" id=6]
 
 [sub_resource type="ViewportTexture" id=25]
 viewport_path = NodePath("Viewport")
@@ -21,13 +21,44 @@ shader_param/wave_c = Vector3( 1.266, 21.954, 0.152 )
 shader_param/wave_d = Vector3( 1.508, 12.934, 0.212 )
 shader_param/synced_time = 0.0
 shader_param/wave_offset = Vector3( 0, 0, 0 )
+shader_param/distance_fade_min = 90.0
+shader_param/distance_fade_max = 70.0
 shader_param/noise_pattern = SubResource( 25 )
 
 [sub_resource type="PlaneMesh" id=3]
 material = SubResource( 11 )
 size = Vector2( 300, 300 )
-subdivide_width = 200
-subdivide_depth = 200
+subdivide_width = 100
+subdivide_depth = 100
+
+[sub_resource type="OpenSimplexNoise" id=38]
+
+[sub_resource type="NoiseTexture" id=39]
+width = 256
+height = 256
+noise = SubResource( 38 )
+
+[sub_resource type="ShaderMaterial" id=36]
+shader = ExtResource( 6 )
+shader_param/NUM_OCTAVES = 3
+shader_param/u_resolution = Vector2( 1, 1 )
+shader_param/line_color = Color( 0, 0.7, 1, 1 )
+shader_param/fill_color = Color( 0, 0.1, 0.1, 1 )
+shader_param/wave_a = Vector3( 0, 1, 0 )
+shader_param/wave_b = Vector3( 0, 1, 0 )
+shader_param/wave_c = Vector3( 0, 1, 0 )
+shader_param/wave_d = Vector3( 0, 1, 0 )
+shader_param/synced_time = 0.0
+shader_param/wave_offset = Vector3( 0, 0, 0 )
+shader_param/distance_fade_min = 15.0
+shader_param/distance_fade_max = 0.0
+shader_param/noise_tex = SubResource( 39 )
+
+[sub_resource type="PlaneMesh" id=37]
+material = SubResource( 36 )
+size = Vector2( 30, 30 )
+subdivide_width = 20
+subdivide_depth = 20
 
 [sub_resource type="SpatialMaterial" id=29]
 flags_unshaded = true
@@ -35,7 +66,7 @@ albedo_color = Color( 0, 0, 0, 1 )
 
 [sub_resource type="PlaneMesh" id=28]
 material = SubResource( 29 )
-size = Vector2( 300, 300 )
+size = Vector2( 100, 100 )
 subdivide_width = 10
 subdivide_depth = 10
 
@@ -43,37 +74,104 @@ subdivide_depth = 10
 radius = 0.2
 height = 0.4
 
-[sub_resource type="ViewportTexture" id=23]
-viewport_path = NodePath("Viewport")
+[sub_resource type="Shader" id=32]
+code = "// NOTE: Shader automatically converted from Godot Engine 3.4.2.stable's SpatialMaterial.
 
-[sub_resource type="ShaderMaterial" id=24]
-resource_local_to_scene = true
-shader = ExtResource( 3 )
-shader_param/fill_color = Color( 0.152941, 0.305882, 0.447059, 1 )
-shader_param/line_color = Color( 0.133333, 0.741176, 0.698039, 1 )
-shader_param/noise_pattern = SubResource( 23 )
+shader_type spatial;
+render_mode blend_mix,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx,vertex_lighting;
+uniform vec4 albedo : hint_color;
+uniform sampler2D texture_albedo : hint_albedo;
+uniform float specular;
+uniform float metallic;
+uniform float distance_fade_min;
+uniform float distance_fade_max;
+uniform float roughness : hint_range(0,1);
+uniform float point_size : hint_range(0,128);
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
 
-[sub_resource type="QuadMesh" id=13]
-material = SubResource( 24 )
-size = Vector2( 40, 40 )
 
-[sub_resource type="OpenSimplexNoise" id=26]
+void vertex() {
+	ROUGHNESS=roughness;
+	UV=UV*uv1_scale.xy+uv1_offset.xy;
+}
 
-[sub_resource type="NoiseTexture" id=27]
-height = 1
-seamless = true
-noise = SubResource( 26 )
 
-[sub_resource type="ShaderMaterial" id=22]
-shader = ExtResource( 6 )
-shader_param/NUM_OCTAVES = 3
-shader_param/u_resolution = Vector2( 3, 3 )
-shader_param/noise_tex = SubResource( 27 )
+
+
+void fragment() {
+	vec2 base_uv = UV;
+	vec4 albedo_tex = texture(texture_albedo,base_uv);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+	METALLIC = metallic;
+	ROUGHNESS = roughness;
+	SPECULAR = specular;
+	{
+		float fade_distance=-VERTEX.z;
+		float fade=clamp(smoothstep(distance_fade_min,distance_fade_max,fade_distance),0.0,1.0);
+		int x = int(FRAGCOORD.x) % 4;
+		int y = int(FRAGCOORD.y) % 4;
+		int index = x + y * 4;
+		float limit = 0.0;
+
+		if (x < 8) {
+			if (index == 0) limit = 0.0625;
+			if (index == 1) limit = 0.5625;
+			if (index == 2) limit = 0.1875;
+			if (index == 3) limit = 0.6875;
+			if (index == 4) limit = 0.8125;
+			if (index == 5) limit = 0.3125;
+			if (index == 6) limit = 0.9375;
+			if (index == 7) limit = 0.4375;
+			if (index == 8) limit = 0.25;
+			if (index == 9) limit = 0.75;
+			if (index == 10) limit = 0.125;
+			if (index == 11) limit = 0.625;
+			if (index == 12) limit = 1.0;
+			if (index == 13) limit = 0.5;
+			if (index == 14) limit = 0.875;
+			if (index == 15) limit = 0.375;
+		}
+
+	if (fade < limit)
+		discard;
+	}
+
+}
+"
+
+[sub_resource type="ShaderMaterial" id=33]
+shader = SubResource( 32 )
+shader_param/albedo = Color( 1, 1, 1, 1 )
+shader_param/specular = 0.5
+shader_param/metallic = 0.0
+shader_param/distance_fade_min = 80.0
+shader_param/distance_fade_max = 50.0
+shader_param/roughness = 1.0
+shader_param/point_size = 1.0
+shader_param/uv1_scale = Vector3( 1, 1, 1 )
+shader_param/uv1_offset = Vector3( 0, 0, 0 )
+shader_param/uv2_scale = Vector3( 1, 1, 1 )
+shader_param/uv2_offset = Vector3( 0, 0, 0 )
+
+[sub_resource type="CubeMesh" id=31]
+material = SubResource( 33 )
+size = Vector3( 10, 10, 10 )
 
 [node name="ocean_test" type="Spatial"]
+script = ExtResource( 3 )
 
 [node name="ocean_surface" type="MeshInstance" parent="."]
 mesh = SubResource( 3 )
+material/0 = null
+script = ExtResource( 4 )
+is_master = true
+
+[node name="test_mesh" type="MeshInstance" parent="."]
+mesh = SubResource( 37 )
+skeleton = NodePath("")
 material/0 = null
 script = ExtResource( 4 )
 
@@ -122,22 +220,9 @@ enabled = true
 angular_damp = 4.0
 camera_yaw = true
 
-[node name="test_mesh" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.012007, 2.61439, -0.679625 )
-visible = false
-mesh = SubResource( 13 )
+[node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13.489, 3.27653, -13.0816 )
+mesh = SubResource( 31 )
 material/0 = null
-
-[node name="Viewport" type="Viewport" parent="."]
-size = Vector2( 512, 512 )
-hdr = false
-disable_3d = true
-
-[node name="ColorRect" type="ColorRect" parent="Viewport"]
-material = SubResource( 22 )
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_right = 40.0
-margin_bottom = 40.0
 
 [editable path="TestBoat"]

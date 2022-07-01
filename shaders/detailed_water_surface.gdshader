@@ -1,16 +1,18 @@
 shader_type spatial;
-render_mode blend_add, vertex_lighting;
+render_mode blend_add, unshaded, vertex_lighting;
+
+uniform int NUM_OCTAVES = 3;
+uniform vec2 u_resolution = vec2(1.0);
+uniform sampler2D noise_tex;
 
 uniform vec4 line_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
 uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
 
-uniform sampler2D noise_pattern;
-
 // angle, speed, wave length, steepness:
-uniform vec3 wave_a = vec3(0.0, 2.1, 0.2);
-uniform vec3 wave_b = vec3(0.0, 0.43, 0.25);
-uniform vec3 wave_c = vec3(0.0, 0.6, 0.3);
-uniform vec3 wave_d = vec3(0.0, 0.6, 0.3);
+uniform vec3 wave_a = vec3(0., 1., 0.);
+uniform vec3 wave_b = vec3(0., 1., 0.);
+uniform vec3 wave_c = vec3(0., 1., 0.);
+uniform vec3 wave_d = vec3(0., 1., 0.);
 
 uniform float synced_time = 0.0;
 uniform vec3 wave_offset = vec3(0.0, 0.0, 0.0);
@@ -74,36 +76,6 @@ void vertex() {
     NORMAL = normal;
 }
 
-// https://www.ronja-tutorials.com/post/026-perlin-noise/
-float surf(vec2 uv) {
-    float noise = texture(noise_pattern, uv).x;
-    noise = fract(noise * 20.0);
-    float pixelNoiseChange = fwidth(noise);
-    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise);
-    heightLine += smoothstep(pixelNoiseChange, 0.0, noise);
-    
-    return heightLine;
-}
-
-
-float line(vec2 uv, float batt) {
-    vec2 size = vec2(0.02);
-    uv = abs(fract(uv) - 0.5);
-    vec2 lines = smoothstep(size, vec2(0.0), uv);
-    lines += smoothstep(size * 5.0, vec2(0.0), uv) * 0.4 * batt;
-    return clamp(lines.x, 0.0, 3.0);
-}
-
-
-vec4 lines(vec2 uv) {
-    vec2 offset = wave_offset.xz / 300.0;
-    uv = (offset + uv) * 100.0;
-
-    vec4 col = fill_color;
-    float gridVal = line(uv, 1.0);
-    col = mix(fill_color, line_color, gridVal);
-    return col;
-}
 
 bool fade(vec3 vtx, vec4 frg) {
     float fade_distance = -vtx.z;
@@ -135,16 +107,78 @@ bool fade(vec3 vtx, vec4 frg) {
     return fade < limit;
 }
 
-void fragment() {
-    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+float random (in vec2 _st) {
+    return fract(sin(dot(_st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
+// Based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (in vec2 _st) {
+//    return texture(noise_tex, _st).x;
     
-    vec2 offset = wave_offset.xz / 100.0;
-    vec2 uv = (offset + UV);
-    vec4 color = lines(UV);
-    vec2 p = (UV - 0.5);
-    float reverse_distance = 0.4 - distance(p, vec2(0.0));
-    color *= vec4(clamp( reverse_distance*2. , 0.0 , 1.0 ));
-    ALBEDO = color.rgb;
+    vec2 i = floor(_st);
+    vec2 f = fract(_st);
+
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+
+
+float fbm ( in vec2 _st) {
+    float v = 0.0;
+    float a = 0.5;
+    vec2 shift = vec2(100.0);
+    // Rotate to reduce axial bias
+    mat2 rot = mat2( vec2(cos(0.5), sin(0.5)) , vec2(-sin(0.5), cos(0.50)) );
+    for (int i = 0; i < NUM_OCTAVES; ++i) {
+        v += a * noise(_st);
+        _st = rot * _st * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
+vec3 lines(float noise_val) {
+    noise_val = fract(noise_val * 20.0);
+    float pixelNoiseChange = 0.1;
+    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise_val);
+    heightLine += smoothstep(pixelNoiseChange, 0.0, noise_val);
+    
+    return vec3(heightLine);    
+}
+
+void fragment() {
+    float t = synced_time;
+    vec2 st = UV + wave_offset.xz / 30.;
+    st *= 3.;
+    vec3 color = vec3(0.0);
+
+    vec2 q = vec2(0.);
+    q.x = fbm( st + 0.00 * t);
+    q.y = fbm( st + vec2(1.0));
+
+    vec2 r = vec2(0.);
+    r.x = fbm( st + 1.0 * q + vec2(1.7,9.2) + 0.15 * t);
+    r.y = fbm( st + 1.0 * q + vec2(8.3,2.8) + 0.126 * t);
+
+    float f = fbm(st+r);
+
+    color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
+    color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
+    color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
+    
+    float dist = distance(UV, vec2(0.5));
+    
+    ALBEDO = vec3(lines(f)) * line_color.rgb;
     
     if (fade(VERTEX, FRAGCOORD)) 
         discard;

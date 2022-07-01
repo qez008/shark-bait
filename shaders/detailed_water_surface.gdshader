@@ -1,9 +1,14 @@
 shader_type spatial;
-render_mode blend_add, unshaded, vertex_lighting;
+render_mode blend_add, unshaded, vertex_lighting, depth_draw_never;
 
 uniform int NUM_OCTAVES = 3;
-uniform vec2 u_resolution = vec2(1.0);
-uniform sampler2D noise_tex;
+uniform float num_lines = 30.;
+uniform float line_width = .1;
+uniform float noise_scale = 1.;
+
+uniform float seed = 0.0;
+
+uniform float y_off = -0.5;
 
 uniform vec4 line_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
 uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
@@ -17,8 +22,7 @@ uniform vec3 wave_d = vec3(0., 1., 0.);
 uniform float synced_time = 0.0;
 uniform vec3 wave_offset = vec3(0.0, 0.0, 0.0);
 
-uniform float distance_fade_min = 90;
-uniform float distance_fade_max = 70;
+uniform float mesh_size = 40.;
 
 
 const float PI = 3.141593;
@@ -72,40 +76,10 @@ void vertex() {
     
     vec3 normal = normalize(cross(binormal, tangent));
     
-    VERTEX.xyz = p - wave_offset;
+    VERTEX.xyz = p * vec3(1., (5. + y_off) / 5., 1.) - wave_offset + vec3(0.0, y_off, 0.0);
     NORMAL = normal;
 }
 
-
-bool fade(vec3 vtx, vec4 frg) {
-    float fade_distance = -vtx.z;
-	float fade = clamp( smoothstep(distance_fade_min, distance_fade_max, fade_distance) , 0.0 , 1.0 );
-	int x = int(frg.x) % 4;
-	int y = int(frg.y) % 4;
-	int index = x + y * 4;
-	float limit = 0.0;
-
-	if (x < 8) {
-		if (index == 0) limit = 0.0625;
-		if (index == 1) limit = 0.5625;
-		if (index == 2) limit = 0.1875;
-		if (index == 3) limit = 0.6875;
-		if (index == 4) limit = 0.8125;
-		if (index == 5) limit = 0.3125;
-		if (index == 6) limit = 0.9375;
-		if (index == 7) limit = 0.4375;
-		if (index == 8) limit = 0.25;
-		if (index == 9) limit = 0.75;
-		if (index == 10) limit = 0.125;
-		if (index == 11) limit = 0.625;
-		if (index == 12) limit = 1.0;
-		if (index == 13) limit = 0.5;
-		if (index == 14) limit = 0.875;
-		if (index == 15) limit = 0.375;
-	}
-   
-    return fade < limit;
-}
 
 float random (in vec2 _st) {
     return fract(sin(dot(_st.xy, vec2(12.9898,78.233))) * 43758.5453123);
@@ -148,18 +122,17 @@ float fbm ( in vec2 _st) {
 }
 
 vec3 lines(float noise_val) {
-    noise_val = fract(noise_val * 20.0);
-    float pixelNoiseChange = 0.1;
-    float heightLine = smoothstep(1.0 - pixelNoiseChange, 1.0, noise_val);
-    heightLine += smoothstep(pixelNoiseChange, 0.0, noise_val);
+    noise_val = fract(noise_val * num_lines);
+    float heightLine = smoothstep(1.0 - line_width, 1.0, noise_val);
+    heightLine += smoothstep(line_width, 0.0, noise_val);
     
     return vec3(heightLine);    
 }
 
 void fragment() {
-    float t = synced_time;
-    vec2 st = UV + wave_offset.xz / 30.;
-    st *= 3.;
+    float t = synced_time * 2.;
+    vec2 st = UV + wave_offset.xz / mesh_size + vec2(seed);
+    st *= noise_scale;
     vec3 color = vec3(0.0);
 
     vec2 q = vec2(0.);
@@ -172,14 +145,14 @@ void fragment() {
 
     float f = fbm(st+r);
 
-    color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
-    color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
-    color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
-    
-    float dist = distance(UV, vec2(0.5));
+//    color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
+//    color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
+//    color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
     
     ALBEDO = vec3(lines(f)) * line_color.rgb;
     
-    if (fade(VERTEX, FRAGCOORD)) 
-        discard;
+
+    float dist = distance((UV - 0.5)* 1.1, vec2(0.));
+    
+    ALPHA = clamp(1. - pow(dist * 2., 2), 0., 1.);
 }

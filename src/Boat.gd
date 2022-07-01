@@ -126,7 +126,7 @@ func apply_buoyancy():
 
 
 func update_hud():
-    var text = ""
+    var text = "mspf: %.1f" % (1000 / Engine.get_frames_per_second())
     text += "\nspeed: %.1f" % abs(linear_velocity.length())
     text += "\nSOG: %.1f" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
     text += "\nboat angle: %.2f" % boat_angle()

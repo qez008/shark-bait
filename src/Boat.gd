@@ -11,7 +11,8 @@ export (float) var surf_boost = 5.0
 export (float) var climb_angle = 0.03
 export (float) var climb_friction = 3.0
 export (float) var steering_rate = 10.0
-export (float) var buoyancy = 30.0
+export (float) var buoyancy_rate = 30.0
+export (float) var max_buoyancy = 30.0
 
 
 
@@ -117,19 +118,31 @@ func is_in_water():
 
 func apply_buoyancy():
     var num_floaters = $floaters.get_child_count()
+
     for floater in $floaters.get_children():
-        var point = (floater as Spatial).global_transform.origin
-        var wave_y = WaveManager.get_wave_height(point)
-        var depth = wave_y - point.y
+
+        var floater_position = (floater as Spatial).global_transform.origin
+        var position = floater_position - global_transform.origin
+        var force = Vector3.DOWN * 9.8 / num_floaters
+        force = Vector3.ZERO
+        var wave_y = WaveManager.get_wave_height(floater_position)
+        var depth = wave_y - floater_position.y
         if depth > 0:
-            add_force(Vector3.UP * depth * buoyancy / num_floaters, point - global_transform.origin)
+            var submergence_level = clamp(depth * buoyancy_rate, 0.0, 1.0)
+            var buoyancy_force = Vector3.UP * submergence_level * max_buoyancy / num_floaters
+            force += buoyancy_force
+
+        add_force(force, position)
 
 
 func update_hud():
-    var text = "mspf: %.1f" % (1000 / Engine.get_frames_per_second())
-    text += "\nspeed: %.1f" % abs(linear_velocity.length())
-    text += "\nSOG: %.1f" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
-    text += "\nboat angle: %.2f" % boat_angle()
+    var text = ""
+    text += "mspf: %.1f\n" % (1000 / Engine.get_frames_per_second())
+    var xyz = [global_transform.origin.x, global_transform.origin.y, global_transform.origin.z]
+    text += "x: %.1f, y: %.1f, z: %.1f\n" % xyz
+    text += "speed: %.1f\n" % abs(linear_velocity.length())
+    text += "SOG: %.1f\n" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
+    text += "boat angle: %.2f\n" % boat_angle()
 
     Hud.get_children()[0].text = text
 

@@ -2,9 +2,9 @@ shader_type spatial;
 render_mode vertex_lighting;
 
 uniform int NUM_OCTAVES = 3;
-uniform float num_lines = 30.;
-uniform float line_width = .1;
-uniform float noise_scale = 1.;
+uniform float num_lines = 30.0;
+uniform float line_width = 0.1;
+uniform float noise_scale = 1.0;
 
 uniform float seed = 0.0;
 

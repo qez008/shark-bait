@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://src/Boat.gd" type="Script" id=1]
 [ext_resource path="res://src/utils/statemachine.gd" type="Script" id=2]
@@ -15,7 +15,11 @@ albedo_color = Color( 0.156863, 0.203922, 0.192157, 1 )
 
 [sub_resource type="CubeMesh" id=8]
 material = SubResource( 9 )
-size = Vector3( 4, 1, 2 )
+size = Vector3( 4, 1, 1.2 )
+
+[sub_resource type="CubeMesh" id=10]
+material = SubResource( 9 )
+size = Vector3( 3.5, 0.6, 0.6 )
 
 [node name="TestBoat" type="RigidBody"]
 linear_damp = 2.0
@@ -23,20 +27,28 @@ angular_damp = 3.0
 script = ExtResource( 1 )
 acceleration = 8.0
 surf_boost = 3.0
-climb_friction = 2.0
 max_buoyancy = 35.0
+bow_path = NodePath("floaters/6")
+stern_path = NodePath("floaters/10")
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.5858 )
 shape = SubResource( 7 )
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5858 )
 mesh = SubResource( 8 )
 skeleton = NodePath("../..")
 material/0 = null
 
+[node name="MeshInstance2" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.310193, -1.69196 )
+mesh = SubResource( 10 )
+skeleton = NodePath("../..")
+material/0 = null
+
 [node name="floaters" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5858 )
 
 [node name="1" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1 )
@@ -52,6 +64,21 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
 
 [node name="5" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1 )
+
+[node name="16" type="Position3D" parent="floaters"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.0239484, -2.25991 )
+
+[node name="17" type="Position3D" parent="floaters"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.0239484, -2.25991 )
+
+[node name="18" type="Position3D" parent="floaters"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0239484, -2.25991 )
+
+[node name="19" type="Position3D" parent="floaters"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -0.0239484, -2.25991 )
+
+[node name="20" type="Position3D" parent="floaters"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.0239484, -2.25991 )
 
 [node name="6" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0 )
@@ -86,22 +113,16 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.02008, 0, 0 )
 
 [node name="camera_target" type="Spatial" parent="camera_rotor"]
-transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.60253, 3.51384, 0 )
+transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.60253, 4.64119, 0 )
 
-[node name="right_target" type="Spatial" parent="camera_rotor"]
-transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 3.514, 2 )
+[node name="right_target" type="Position3D" parent="camera_rotor"]
+transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 4.64135, 2 )
 
-[node name="left_target" type="Spatial" parent="camera_rotor"]
-transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 3.514, -2 )
+[node name="left_target" type="Position3D" parent="camera_rotor"]
+transform = Transform( -4.37114e-08, 0.35145, -0.936207, 0, 0.936207, 0.35145, 1, 1.53624e-08, -4.09229e-08, -4.603, 4.64135, -2 )
 
 [node name="propeller" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -0.5, 0 )
-
-[node name="bow" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.12954, 0.769804, 0 )
-
-[node name="stern" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.06966, 0.769804, 0 )
 
 [node name="state_machine" type="Node" parent="."]
 script = ExtResource( 2 )

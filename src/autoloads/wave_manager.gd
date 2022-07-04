@@ -114,10 +114,10 @@ func get_wave_time() -> float:
     return _time
 
 
-func get_wave_height(target: Vector3) -> float:
+func get_wave_height(target: Vector3, iterations=5) -> float:
     var p = target
 
-    for _i in range(0, 5):
+    for _i in range(0, iterations):
         var q = sample_wave(p.x, p.z)
         p += target - q
 

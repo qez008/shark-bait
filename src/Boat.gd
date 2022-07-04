@@ -11,7 +11,7 @@ export (float) var surf_boost = 5.0
 export (float) var climb_angle = 0.03
 export (float) var climb_friction = 3.0
 export (float) var steering_rate = 10.0
-export (float) var buoyancy_rate = 30.0
+export (float) var displacement_rate = 1.0
 export (float) var max_buoyancy = 30.0
 
 
@@ -38,8 +38,8 @@ func _ready():
     if camera_pitch or camera_yaw:
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-    for state in $state_machine._states.values():
-        state.body = self
+#    for state in $state_machine._states.values():
+#        state.body = self
 
     $camera_rotor/camera_target.transform.origin = $camera_rotor/right_target.transform.origin
 
@@ -128,7 +128,7 @@ func apply_buoyancy():
         var wave_y = WaveManager.get_wave_height(floater_position)
         var depth = wave_y - floater_position.y
         if depth > 0:
-            var submergence_level = clamp(depth * buoyancy_rate, 0.0, 1.0)
+            var submergence_level = clamp(depth * displacement_rate, 0.0, 1.0)
             var buoyancy_force = Vector3.UP * submergence_level * max_buoyancy / num_floaters
             force += buoyancy_force
 

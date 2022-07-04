@@ -24,7 +24,7 @@ script = ExtResource( 1 )
 acceleration = 8.0
 surf_boost = 3.0
 climb_friction = 2.0
-buoyancy_rate = 1.0
+max_buoyancy = 35.0
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )

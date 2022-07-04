@@ -1,13 +1,13 @@
 extends Spatial
 
-
-onready var general_surface := $ocean_surface
+export (NodePath) var general_surface
 
 var general_material: ShaderMaterial
 
 
 func _ready():
-    general_material = general_surface.mesh.surface_get_material(0)
+    print(general_surface)
+    general_material = get_node(general_surface).mesh.surface_get_material(0)
     WaveManager.set_wave_config([
             general_material.get_shader_param("wave_a"),
             general_material.get_shader_param("wave_b"),

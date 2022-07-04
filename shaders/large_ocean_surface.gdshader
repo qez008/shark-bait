@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode vertex_lighting, blend_add;
+render_mode vertex_lighting;
 
 uniform int NUM_OCTAVES = 3;
 uniform float num_lines = 30.;
@@ -129,32 +129,48 @@ vec3 lines(float noise_val) {
     return vec3(heightLine);    
 }
 
-void fragment() {
-    float t = synced_time * 2.;
-    vec2 st = UV + wave_offset.xz / mesh_size + vec2(seed);
+const float treshold = 0.12;
+
+vec3 surface_pattern(float dist, vec2 uv, float time) {
+    vec2 st = uv + wave_offset.xz / mesh_size + vec2(seed);
     st *= noise_scale;
     vec3 color = vec3(0.0);
 
     vec2 q = vec2(0.);
-    q.x = fbm( st + 0.00 * t);
+    q.x = fbm( st + 0.00 * time);
     q.y = fbm( st + vec2(1.0));
 
     vec2 r = vec2(0.);
-    r.x = fbm( st + 1.0 * q + vec2(1.7,9.2) + 0.15 * t);
-    r.y = fbm( st + 1.0 * q + vec2(8.3,2.8) + 0.126 * t);
+    r.x = fbm( st + 1.0 * q + vec2(1.7,9.2) + 0.15 * time);
+    r.y = fbm( st + 1.0 * q + vec2(8.3,2.8) + 0.126 * time);
 
     float f = fbm(st+r);
+    
+    return vec3(lines(f)) * line_color.rgb * (treshold - dist) / treshold;
+}
 
-//    color = mix( vec3(0.101961, 0.619608, 0.666667) , vec3(0.666667, 0.666667, 0.498039) , clamp((f * f) * 4.0, 0.0, 1.0) );
-//    color = mix( color , vec3(0.0, 0.0, 0.164706) , clamp(length(q), 0.0, 1.0) );
-//    color = mix( color , vec3(0.666667, 1.0, 1.0) , clamp(abs(r.x), 0.0, 1.0) );
+void fragment() {
+    float t = synced_time * 2.0;
     
-    ALBEDO = vec3(lines(f)) * line_color.rgb;
-    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    ALBEDO = fill_color.rgb;
     
+    float dist = distance((UV - 0.5), vec2(0.0));
+    if (dist < treshold) {
+        ALBEDO += surface_pattern(dist, UV, t);        
+    }
     
-
-    float dist = distance((UV - 0.5)* 1.1, vec2(0.));
+//    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+//    ALBEDO = fill_color.rgb;
+    METALLIC = 0.0;
+    ROUGHNESS = 0.3;
+    SPECULAR = 0.1;
     
-    ALPHA = clamp(1. - pow(dist * 2., 2), 0., 1.);
+//    ALPHA = clamp(1. - pow(dist * 2., 2), 0., 1.);
+//    float depth;
+//    float depth = texture(DEPTH_TEXTURE, SCREEN_UV).r;
+//    depth = depth * 2.0 - 1.0;
+//    depth = PROJECTION_MATRIX[3][2] / (depth + PROJECTION_MATRIX[2][2]);
+//    depth = depth + VERTEX.z;
+//    depth = exp(-depth * 0.5);
+//    ALPHA = clamp(1.0 - depth, 0.0, 1.0);
 }

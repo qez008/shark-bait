@@ -7,7 +7,7 @@
 [ext_resource path="res://src/floater.gd" type="Script" id=5]
 [ext_resource path="res://shaders/detailed_water_surface.gdshader" type="Shader" id=6]
 
-[sub_resource type="ProceduralSky" id=40]
+[sub_resource type="ProceduralSky" id=43]
 sky_top_color = Color( 0.0862745, 0.309804, 0.545098, 1 )
 sky_horizon_color = Color( 0.4, 0.752941, 0.890196, 1 )
 ground_bottom_color = Color( 0.027451, 0.0431373, 0.0588235, 1 )
@@ -19,7 +19,7 @@ sun_longitude = -91.76
 
 [sub_resource type="Environment" id=41]
 background_mode = 2
-background_sky = SubResource( 40 )
+background_sky = SubResource( 43 )
 ambient_light_color = Color( 0.152941, 0.152941, 0.219608, 1 )
 ambient_light_energy = 13.33
 ambient_light_sky_contribution = 0.79
@@ -48,7 +48,7 @@ size = Vector2( 300, 300 )
 subdivide_width = 100
 subdivide_depth = 100
 
-[sub_resource type="ShaderMaterial" id=36]
+[sub_resource type="ShaderMaterial" id=44]
 shader = ExtResource( 6 )
 shader_param/NUM_OCTAVES = 2
 shader_param/num_lines = 16.0
@@ -56,7 +56,7 @@ shader_param/line_width = 0.086
 shader_param/noise_scale = 32.474
 shader_param/seed = 0.0
 shader_param/y_off = -0.5
-shader_param/line_color = Color( 0, 0.7, 1, 1 )
+shader_param/line_color = Color( 0.14902, 0.607843, 0.803922, 1 )
 shader_param/fill_color = Color( 0, 0.1, 0.1, 1 )
 shader_param/wave_a = Vector3( 0, 1, 0 )
 shader_param/wave_b = Vector3( 0, 1, 0 )
@@ -67,7 +67,7 @@ shader_param/wave_offset = Vector3( 0, 0, 0 )
 shader_param/mesh_size = 60.0
 
 [sub_resource type="PlaneMesh" id=37]
-material = SubResource( 36 )
+material = SubResource( 44 )
 size = Vector2( 60, 60 )
 subdivide_width = 40
 subdivide_depth = 40
@@ -193,6 +193,7 @@ size = Vector3( 10, 10, 10 )
 
 [node name="ocean_test" type="Spatial"]
 script = ExtResource( 3 )
+general_surface = NodePath("ocean_surface")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 41 )
@@ -250,13 +251,14 @@ target = NodePath("../TestBoat/camera_rotor/camera_target")
 speed = 2.0
 enabled = true
 
-[node name="TestBoat" parent="." instance=ExtResource( 2 )]
-angular_damp = 3.0
-camera_yaw = true
-
 [node name="MeshInstance" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13.489, -1.13476, -13.0816 )
 mesh = SubResource( 31 )
 material/0 = null
+
+[node name="TestBoat" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15.8116, 0 )
+angular_damp = 4.0
+camera_yaw = true
 
 [editable path="TestBoat"]

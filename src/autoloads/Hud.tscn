@@ -1,6 +1,12 @@
-[gd_scene format=2]
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/autoloads/hud.gd" type="Script" id=1]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 37.0
 
 [node name="Hud" type="CanvasLayer"]
+script = ExtResource( 1 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="."]
 margin_left = 11.0
@@ -9,6 +15,54 @@ margin_right = 911.0
 margin_bottom = 173.0
 text = "Sample text"
 scroll_active = false
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="compass" type="Node2D" parent="."]
+position = Vector2( 640, 57.624 )
+
+[node name="guide" type="Area2D" parent="compass"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="compass/guide"]
+shape = SubResource( 1 )
+
+[node name="needle_origin" type="Position2D" parent="compass"]
+
+[node name="needle" type="Polygon2D" parent="compass/needle_origin"]
+position = Vector2( 0, 10 )
+scale = Vector2( 1.4, 2 )
+color = Color( 0.129412, 0.145098, 0.145098, 1 )
+polygon = PoolVector2Array( 7, 4, 0, -16, -7, 4, 0, 0 )
+
+[node name="spinny" type="Node2D" parent="compass"]
+
+[node name="N" type="Label" parent="compass/spinny"]
+margin_left = -21.0
+margin_top = -43.0
+margin_right = 19.0
+margin_bottom = -29.0
+text = "N"
+align = 1
+
+[node name="S" type="Label" parent="compass/spinny"]
+margin_left = -20.0
+margin_top = 31.0
+margin_right = 20.0
+margin_bottom = 45.0
+text = "S"
+align = 1
+
+[node name="W" type="Label" parent="compass/spinny"]
+margin_left = -57.0
+margin_top = -9.0
+margin_right = -17.0
+margin_bottom = 5.0
+text = "W"
+align = 1
+
+[node name="E" type="Label" parent="compass/spinny"]
+margin_left = 18.0
+margin_top = -7.0
+margin_right = 58.0
+margin_bottom = 7.0
+text = "E"
+align = 1

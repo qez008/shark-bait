@@ -135,7 +135,7 @@ func apply_buoyancy():
         var position = floater_position - global_transform.origin
         var force = Vector3.DOWN * 9.8 / num_floaters
         force = Vector3.ZERO
-        var wave_y = WaveManager.get_wave_height(floater_position)
+        var wave_y = WaveManager.calculate_wave_height(floater_position)
 
         var depth = wave_y - floater_position.y
 
@@ -152,8 +152,8 @@ func wave_slope() -> float:
     var a = stern.global_transform.origin
     var b = bow.global_transform.origin
 
-    var y1 = WaveManager.get_wave_height(a)
-    var y2 = WaveManager.get_wave_height(b)
+    var y1 = WaveManager.calculate_wave_height(a)
+    var y2 = WaveManager.calculate_wave_height(b)
 
     return y1 - y2
 
@@ -162,7 +162,7 @@ func is_in_water() -> bool:
     var floaters_in_water = 0
     for floater in floaters.get_children():
         var floater_position = (floater as Spatial).global_transform.origin
-        if floater_position.y - 0.1 < WaveManager.get_wave_height(floater_position, 5):
+        if floater_position.y - 0.1 < WaveManager.calculate_wave_height(floater_position, 5):
             floaters_in_water += 1
             if floaters_in_water > num_floaters / 4:
                 return true

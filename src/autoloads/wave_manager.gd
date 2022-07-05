@@ -114,7 +114,7 @@ func get_wave_time() -> float:
     return _time
 
 
-func get_wave_height(target: Vector3, iterations=5) -> float:
+func calculate_wave_height(target: Vector3, iterations=5) -> float:
     var p = target
 
     for _i in range(0, iterations):

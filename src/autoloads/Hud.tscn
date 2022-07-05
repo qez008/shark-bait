@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://src/autoloads/hud.gd" type="Script" id=1]
+[ext_resource path="res://src/autoloads/track_display.gd" type="Script" id=2]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 37.0
@@ -16,8 +17,19 @@ margin_bottom = 173.0
 text = "Sample text"
 scroll_active = false
 
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 1044.0
+margin_top = 508.0
+margin_right = 1204.0
+margin_bottom = 668.0
+color = Color( 0.180392, 0.192157, 0.203922, 0.537255 )
+
+[node name="track_display" type="Node2D" parent="ColorRect"]
+position = Vector2( 80, 80 )
+script = ExtResource( 2 )
+
 [node name="compass" type="Node2D" parent="."]
-position = Vector2( 640, 57.624 )
+position = Vector2( 640, 57 )
 
 [node name="guide" type="Area2D" parent="compass"]
 visible = false

@@ -89,6 +89,16 @@ func sample_wave(x: float, z: float) -> Vector3:
     return q
 
 
+func calculate_wave_height(target: Vector3, iterations=5) -> float:
+    var p = target
+
+    for _i in range(0, iterations):
+        var q = sample_wave(p.x, p.z)
+        p += target - q
+
+    return sample_wave(p.x, p.z).y
+
+
 # SETTERS:
 
 func set_wave_config(config):
@@ -113,12 +123,3 @@ func set_wave_offset(x, z):
 func get_wave_time() -> float:
     return _time
 
-
-func calculate_wave_height(target: Vector3, iterations=5) -> float:
-    var p = target
-
-    for _i in range(0, iterations):
-        var q = sample_wave(p.x, p.z)
-        p += target - q
-
-    return sample_wave(p.x, p.z).y

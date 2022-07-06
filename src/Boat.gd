@@ -164,7 +164,7 @@ func is_in_water() -> bool:
         var floater_position = (floater as Spatial).global_transform.origin
         if floater_position.y - 0.1 < WaveManager.calculate_wave_height(floater_position, 5):
             floaters_in_water += 1
-            if floaters_in_water > num_floaters / 4:
+            if floaters_in_water > num_floaters / 4.0:
                 return true
 
     return false

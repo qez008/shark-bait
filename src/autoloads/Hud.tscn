@@ -29,7 +29,7 @@ position = Vector2( 80, 80 )
 script = ExtResource( 2 )
 
 [node name="compass" type="Node2D" parent="."]
-position = Vector2( 640, 57 )
+position = Vector2( 643, 58 )
 
 [node name="guide" type="Area2D" parent="compass"]
 visible = false

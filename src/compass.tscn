@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://src/compass.gd" type="Script" id=1]
+[ext_resource path="res://assets/compass/compass-1-_0001_Layer-2.png" type="Texture" id=2]
+[ext_resource path="res://assets/compass/compass-1-_0000_Layer-1.png" type="Texture" id=3]
+[ext_resource path="res://assets/compass/compass-1-_0005_Layer-7.png" type="Texture" id=4]
+[ext_resource path="res://assets/compass/compass-1-_0003_Layer-4.png" type="Texture" id=5]
+[ext_resource path="res://assets/compass/compass-1-_0004_Layer-5.png" type="Texture" id=6]
+[ext_resource path="res://assets/compass/compass-1-_0002_Layer-3.png" type="Texture" id=7]
+
+[node name="compass" type="Node2D"]
+position = Vector2( 611, 326 )
+scale = Vector2( 0.169187, 0.169187 )
+script = ExtResource( 1 )
+
+[node name="comp1" type="Position2D" parent="."]
+rotation = 5.92173
+
+[node name="Compass-1-0005Layer-7" type="Sprite" parent="comp1"]
+position = Vector2( 2.5, 0 )
+texture = ExtResource( 4 )
+
+[node name="comp2" type="Position2D" parent="."]
+rotation = 2.96086
+
+[node name="Compass-1-0004Layer-5" type="Sprite" parent="comp2"]
+position = Vector2( -503, -114 )
+texture = ExtResource( 6 )
+
+[node name="comp3" type="Position2D" parent="."]
+rotation = 11.8435
+
+[node name="Compass-1-0003Layer-4" type="Sprite" parent="comp3"]
+position = Vector2( 2.5, 0 )
+texture = ExtResource( 5 )
+
+[node name="comp4" type="Position2D" parent="."]
+rotation = -2.96086
+
+[node name="Compass-1-0002Layer-3" type="Sprite" parent="comp4"]
+position = Vector2( 2.5, 0 )
+texture = ExtResource( 7 )
+
+[node name="comp5" type="Position2D" parent="."]
+rotation = -1.48043
+
+[node name="Compass-1-0001Layer-2" type="Sprite" parent="comp5"]
+position = Vector2( 2.5, 0 )
+texture = ExtResource( 2 )
+
+[node name="comp6" type="Position2D" parent="."]
+rotation = -11.8435
+
+[node name="Compass-1-0000Layer-1" type="Sprite" parent="comp6"]
+position = Vector2( 298.23, -375.112 )
+rotation = 1.33677
+texture = ExtResource( 3 )
+offset = Vector2( 226.844, 436.891 )

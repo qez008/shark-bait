@@ -58,6 +58,7 @@ func _unhandled_input(event):
 
 
 func wave_function(wave_param: Vector3, time: float, point: Vector3) -> Vector3:
+
     var angle = wave_param.x
     var wave_len = wave_param.y
     var steepness = wave_param.z

@@ -5,10 +5,11 @@ uniform int NUM_OCTAVES = 3;
 uniform float num_lines = 30.0;
 uniform float line_width = 0.1;
 uniform float noise_scale = 1.0;
+uniform float treshold : hint_range(0.0, 1.0) = 0.12;
 
 uniform float seed = 0.0;
 
-uniform float y_off = -0.5;
+uniform float y_off = 0.0;
 
 uniform vec4 line_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
 uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
@@ -129,8 +130,6 @@ vec3 lines(float noise_val) {
     return vec3(heightLine);    
 }
 
-const float treshold = 0.12;
-
 vec3 surface_pattern(float dist, vec2 uv, float time) {
     vec2 st = uv + wave_offset.xz / mesh_size + vec2(seed);
     st *= noise_scale;
@@ -156,7 +155,7 @@ void fragment() {
     
     float dist = distance((UV - 0.5), vec2(0.0));
     if (dist < treshold) {
-        ALBEDO += surface_pattern(dist, UV, t);        
+        ALBEDO += surface_pattern(dist, UV, t) * normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
     }
     
 //    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));

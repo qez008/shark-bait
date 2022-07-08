@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/custom_mesh.gd" type="Script" id=1]
+
+[sub_resource type="ArrayMesh" id=1]
+surfaces/0 = {
+"aabb": AABB( -0.866025, 0, -1, 1.73205, 1e-05, 2 ),
+"array_data": PoolByteArray( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 216, 179, 93, 63, 0, 0, 0, 0, 255, 255, 255, 190, 215, 179, 93, 63, 0, 0, 0, 0, 1, 0, 0, 63, 46, 189, 187, 179, 0, 0, 0, 0, 0, 0, 128, 63, 216, 179, 93, 191, 0, 0, 0, 0, 253, 255, 255, 62, 216, 179, 93, 191, 0, 0, 0, 0, 253, 255, 255, 190 ),
+"array_index_data": PoolByteArray(  ),
+"blend_shape_data": [  ],
+"format": 2194433,
+"index_count": 0,
+"primitive": 6,
+"skeleton_aabb": [  ],
+"vertex_count": 7
+}
+
+[node name="custom_mesh" type="MeshInstance"]
+mesh = SubResource( 1 )
+material/0 = null
+script = ExtResource( 1 )

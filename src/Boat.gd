@@ -100,7 +100,8 @@ func move_in_water():
     var slope = wave_slope()
     # slide with the slope of the waves:
     var flow_with_slope = pow(abs(slope), 2) * sign(slope)
-    add_central_force(global_transform.basis.xform(Vector3.RIGHT * flow_with_slope))
+#    add_central_force(global_transform.basis.xform(Vector3.RIGHT * flow_with_slope))
+    add_central_force((bow.global_transform.origin - stern.global_transform.origin).normalized() * flow_with_slope)
 
     # accelerate
     if Input.is_action_pressed("ui_up"):

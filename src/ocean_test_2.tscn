@@ -28,6 +28,7 @@ shader_param/NUM_OCTAVES = 3
 shader_param/num_lines = 8.0
 shader_param/line_width = 0.1
 shader_param/noise_scale = 120.0
+shader_param/treshold = 0.12
 shader_param/seed = 0.0
 shader_param/y_off = -0.5
 shader_param/line_color = Color( 0.0588235, 0.427451, 0.698039, 1 )

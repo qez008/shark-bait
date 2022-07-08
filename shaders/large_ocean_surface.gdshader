@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode vertex_lighting;
+//render_mode ;
 
 uniform int NUM_OCTAVES = 3;
 uniform float num_lines = 30.0;
@@ -155,10 +155,10 @@ void fragment() {
     
     float dist = distance((UV - 0.5), vec2(0.0));
     if (dist < treshold) {
-        ALBEDO += surface_pattern(dist, UV, t) * normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+        ALBEDO += surface_pattern(dist, UV, t);// * normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
     }
     
-//    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
 //    ALBEDO = fill_color.rgb;
     METALLIC = 0.0;
     ROUGHNESS = 0.3;

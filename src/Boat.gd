@@ -90,7 +90,7 @@ func _update_rotation(_delta):
 
 
 func _physics_process(_delta):
-    move_in_water() if is_in_water() else move_in_air()
+    var _b = move_in_water() if is_in_water() else move_in_air()
 
 
 func move_in_water():

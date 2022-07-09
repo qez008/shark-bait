@@ -45,6 +45,8 @@ var _total_pitch = 0.0
 var num_floaters: int
 var state = IN_WATER
 
+var _is_in_water: bool
+
 func _ready():
     num_floaters = floaters.get_child_count()
 
@@ -89,23 +91,32 @@ func _update_rotation(_delta):
         camera_rotor.rotate_object_local(Vector3(1,0,0), deg2rad(-_pitch))
 
 
+
 func _physics_process(_delta):
-    var _b = move_in_water() if is_in_water() else move_in_air()
+    _is_in_water = is_in_water()
+
+    if _is_in_water:
+#        angular_damp = 4
+        move_in_water()
+    else:
+#        angular_damp = 1
+        move_in_air()
 
 
 func move_in_water():
 
     apply_buoyancy()
 
+    var direction = (bow.global_transform.origin - stern.global_transform.origin).normalized()
     var slope = wave_slope()
     # slide with the slope of the waves:
     var flow_with_slope = pow(abs(slope), 2) * sign(slope)
 #    add_central_force(global_transform.basis.xform(Vector3.RIGHT * flow_with_slope))
-    add_central_force((bow.global_transform.origin - stern.global_transform.origin).normalized() * flow_with_slope)
+    add_central_force(direction * flow_with_slope)
 
     # accelerate
     if Input.is_action_pressed("ui_up"):
-        add_central_force(global_transform.basis.xform(Vector3.RIGHT * acceleration))
+        add_central_force((direction * acceleration))
         # apply speed boost when going 'downhill' i.e. surfing
         if slope > 0.0:
             var v = Vector3.RIGHT * surf_boost * sqrt(slope * 2.5)
@@ -115,17 +126,18 @@ func move_in_water():
             var v = Vector3.LEFT * surf_boost * sqrt(-slope * 2.5) * 0.1
             add_central_force(global_transform.basis.xform(v))
 
-    var direction = Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
+    var input_direction = get_input_direction()
     # steer
-    if direction != 0:
-        add_torque(Vector3(0, steering_rate * direction, 0))
+    if input_direction != 0:
+        add_torque(Vector3(0, steering_rate * input_direction, 0))
 
 
 func move_in_air():
-    var direction = Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
+    apply_buoyancy()
+    var input_direction = get_input_direction()
     # steer, but in the air:
-    if direction != 0:
-        add_torque(Vector3(0, steering_rate * direction * 0.2, 0))
+    if input_direction != 0:
+        add_torque(Vector3(0, steering_rate * input_direction * 0.2, 0))
 
 
 func apply_buoyancy():
@@ -171,6 +183,10 @@ func is_in_water() -> bool:
     return false
 
 
+func get_input_direction() -> float:
+    return Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
+
+
 func update_hud():
     var text = ""
     text += "mspf: %.1f\n" % (1000 / Engine.get_frames_per_second())
@@ -183,7 +199,7 @@ func update_hud():
     text += "speed: %.1f\n" % abs(linear_velocity.length())
     text += "SOG: %.1f\n" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
     text += "slope: %.2f\n" % wave_slope()
-    text += "in water: " + str(is_in_water())
+    text += "in water: " + str(_is_in_water)
 
     Hud.get_children()[0].text = text
 

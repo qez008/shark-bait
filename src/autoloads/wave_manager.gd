@@ -8,8 +8,8 @@ signal update_wave_offset
 var quiet_waves = [
 #        Vector3(PI / 2.1, 42.0, 0.08),
 #        Vector3(PI / 2.4, 60.0, 0.07),
-        Vector3(0.0, 1.0, 0.0),
-        Vector3(0.0, 1.0, 0.0),
+        Vector3(0.5, 20.0, 0.1),
+        Vector3(1.0, 40.0, 0.1),
         Vector3(0.0, 1.0, 0.0),
         Vector3(0.0, 1.0, 0.0)
    ]

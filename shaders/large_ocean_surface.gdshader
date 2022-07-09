@@ -77,6 +77,9 @@ void vertex() {
     
     vec3 normal = normalize(cross(binormal, tangent));
     
+    float dist = distance(VERTEX.xz, vec2(0.0)) / 200.0;
+    p.y *= (1.0 - pow(dist, 2));
+    
     VERTEX.xyz = p * vec3(1., (5. + y_off) / 5., 1.) - wave_offset + vec3(0.0, y_off, 0.0);
     NORMAL = normal;
 }

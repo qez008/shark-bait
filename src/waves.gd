@@ -32,5 +32,15 @@ func set_waves(wave_config: Array):
 
 
 func set_wave_offset(offset: Vector3):
-    _shader_mat.set_shader_param("wave_offset", offset)
-    self.global_transform.origin = offset
+
+    var size = 200 / 50.0
+    var w = size * 2
+    var h = sqrt(3) * w
+
+    var x1 = fmod(offset.x, w)
+    var z1 = fmod(offset.z, h)
+
+    var modulated_offset = offset - Vector3(x1, 0, z1)
+
+    _shader_mat.set_shader_param("wave_offset", modulated_offset)
+    self.global_transform.origin = modulated_offset

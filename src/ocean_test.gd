@@ -7,6 +7,7 @@ onready var camera = $InterpolatedCamera
 func _physics_process(delta):
 
     var pos = camera.global_transform.origin
+
     WaveManager.set_wave_offset(pos.x, pos.z)
 
     Hud.set_compass_angle(camera.rotation.y)

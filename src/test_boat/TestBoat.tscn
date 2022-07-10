@@ -6,7 +6,7 @@
 extents = Vector3( 2, 0.1, 1 )
 
 [sub_resource type="SpatialMaterial" id=9]
-albedo_color = Color( 0.156863, 0.203922, 0.192157, 1 )
+albedo_color = Color( 0.882353, 0.917647, 0.909804, 1 )
 
 [sub_resource type="CubeMesh" id=8]
 material = SubResource( 9 )
@@ -30,29 +30,46 @@ bow_path = NodePath("floaters/6")
 stern_path = NodePath("floaters/10")
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.5858 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.0104555 )
 shape = SubResource( 7 )
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5858 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.0104555 )
 mesh = SubResource( 8 )
 skeleton = NodePath("../..")
 material/0 = null
 
 [node name="MeshInstance2" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.310193, -1.69196 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.310193, -2.2673 )
+visible = false
 mesh = SubResource( 10 )
 skeleton = NodePath("../..")
 material/0 = null
 
 [node name="MeshInstance3" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.979428, 0.201796, 0, -0.201796, 0.979428, 0, 0.72, -0.823 )
+transform = Transform( 1, 0, 0, 0, 0.979428, 0.201796, 0, -0.201796, 0.979428, 0, 0.72, -1.39834 )
+visible = false
 mesh = SubResource( 11 )
 skeleton = NodePath("../MeshInstance2")
 material/0 = SubResource( 9 )
 
+[node name="16" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.0239484, -2.24945 )
+
+[node name="17" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.0239484, -2.24945 )
+
+[node name="18" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0239484, -2.24945 )
+
+[node name="19" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -0.0239484, -2.24945 )
+
+[node name="20" type="Position3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.0239484, -2.24945 )
+
 [node name="floaters" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5858 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0104555 )
 
 [node name="1" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1 )
@@ -68,21 +85,6 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
 
 [node name="5" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1 )
-
-[node name="16" type="Position3D" parent="floaters"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.0239484, -2.25991 )
-
-[node name="17" type="Position3D" parent="floaters"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.0239484, -2.25991 )
-
-[node name="18" type="Position3D" parent="floaters"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0239484, -2.25991 )
-
-[node name="19" type="Position3D" parent="floaters"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -0.0239484, -2.25991 )
-
-[node name="20" type="Position3D" parent="floaters"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.0239484, -2.25991 )
 
 [node name="6" type="Position3D" parent="floaters"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0 )

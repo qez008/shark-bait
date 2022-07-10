@@ -33,7 +33,8 @@ func set_waves(wave_config: Array):
 
 func set_wave_offset(offset: Vector3):
 
-    var size = 200 / 50.0
+    # snap positions to hexagon grid:
+    var size = 200 / 50.0   # polygon mesh size / polygon mesh rings
     var w = size * 2
     var h = sqrt(3) * w
 

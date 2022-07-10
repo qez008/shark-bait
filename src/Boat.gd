@@ -14,9 +14,12 @@ onready var camera_rotor = $camera_rotor
 export (float) var acceleration = 3.0
 export (float) var surf_boost = 5.0
 export (float) var steering_rate = 10.0
+
 export (float) var displacement_rate = 1.0
 export (float) var max_buoyancy = 30.0
-
+export (float) var slamming_force = 1.0
+export (float) var linear_water_resistance = 0.5
+export (float) var angular_water_resistance = 8.0
 
 
 # Camera export variables:
@@ -34,7 +37,7 @@ export (NodePath) var stern_path
 var bow: Spatial
 var stern: Spatial
 
-# Intern camera variables:
+# Internal camera variables:
 var _mouse_offset = Vector2()
 var _rotation_offset = Vector2()
 var _yaw = 0.0
@@ -45,10 +48,17 @@ var _total_pitch = 0.0
 var num_floaters: int
 var state = IN_WATER
 
+
+# Internal state variables:
 var _is_in_water: bool
+var _was_in_water: bool
+var _sub_lvl: float
+var _floaters_in_water = []
 
 func _ready():
     num_floaters = floaters.get_child_count()
+    for _i in num_floaters:
+        _floaters_in_water.append(false)
 
     bow = get_node(bow_path)
     stern = get_node(stern_path)
@@ -62,6 +72,11 @@ func _ready():
 func _input(event):
     if event is InputEventMouseMotion:
         _mouse_offset = event.relative
+
+    if event.is_action_pressed("flip"):
+        transform.origin.y = 10
+        transform.basis = Vector3.ZERO
+
     # quit
     if event.is_action_pressed("ui_cancel"):
         get_tree().quit()
@@ -93,43 +108,53 @@ func _update_rotation(_delta):
 
 
 func _physics_process(_delta):
+
     _is_in_water = is_in_water()
+    _sub_lvl = calculate_sub_lvl()
+
+#    # impact with the water:
+#    if not was_in_water and _is_in_water:
+#        apply_central_impulse(Vector3.UP * abs(linear_velocity.y) * slamming_force)
+
+    angular_damp = max(2, _sub_lvl * angular_water_resistance)
+    linear_damp = max(1, 1 + _sub_lvl * linear_water_resistance)
 
     if _is_in_water:
-#        angular_damp = 4
         move_in_water()
     else:
-#        angular_damp = 1
         move_in_air()
+
+    _was_in_water = _is_in_water
 
 
 func move_in_water():
 
     apply_buoyancy()
 
-    var direction = (bow.global_transform.origin - stern.global_transform.origin).normalized()
+#    var direction = (bow.global_transform.origin - stern.global_transform.origin).normalized()
+    var direction = global_transform.basis.xform(Vector3.RIGHT)
     var slope = wave_slope()
     # slide with the slope of the waves:
-    var flow_with_slope = pow(abs(slope), 2) * sign(slope)
+#    var flow_with_slope = pow(abs(slope), 2) * sign(slope)
 #    add_central_force(global_transform.basis.xform(Vector3.RIGHT * flow_with_slope))
-    add_central_force(direction * flow_with_slope)
+#    add_central_force(direction * flow_with_slope)
 
     # accelerate
     if Input.is_action_pressed("ui_up"):
-        add_central_force((direction * acceleration))
+        add_central_force(direction * acceleration)
         # apply speed boost when going 'downhill' i.e. surfing
         if slope > 0.0:
             var v = Vector3.RIGHT * surf_boost * sqrt(slope * 2.5)
             add_central_force(global_transform.basis.xform(v))
-
+        # .. and reduce speed when going uphill
         else:
-            var v = Vector3.LEFT * surf_boost * sqrt(-slope * 2.5) * 0.1
+            var v = Vector3.LEFT * pow(abs(slope/2), 4)
             add_central_force(global_transform.basis.xform(v))
 
     var input_direction = get_input_direction()
     # steer
     if input_direction != 0:
-        add_torque(Vector3(0, steering_rate * input_direction, 0))
+        add_torque(Vector3(0, steering_rate * input_direction * _sub_lvl, 0))
 
 
 func move_in_air():
@@ -142,20 +167,31 @@ func move_in_air():
 
 func apply_buoyancy():
 
-    for floater in floaters.get_children():
-
-        var floater_position = (floater as Spatial).global_transform.origin
+    for i in num_floaters:
+        var floater_position = floaters.get_child(i).global_transform.origin
         var position = floater_position - global_transform.origin
-        var force = Vector3.DOWN * 9.8 / num_floaters
-        force = Vector3.ZERO
+        var force = Vector3.DOWN * 16 / num_floaters
+#        force = Vector3.ZERO
         var wave_y = WaveManager.calculate_wave_height(floater_position)
 
         var depth = wave_y - floater_position.y
 
         if depth > 0:
             var submergence_level = clamp(depth * displacement_rate, 0.0, 1.0)
-            var buoyancy_force = Vector3.UP * submergence_level * max_buoyancy / num_floaters
+            var buoyancy_force = Vector3.UP * pow(submergence_level, 1.2) * max_buoyancy / num_floaters
             force += buoyancy_force
+            # floater makes impact with water:
+            if not _floaters_in_water[i]:
+#            if _is_in_water and not _was_in_water:
+                var impact_force = Vector3.UP * abs(linear_velocity.y) * slamming_force
+                apply_impulse(position, impact_force / num_floaters)
+
+            _floaters_in_water[i] = true
+
+
+
+        else:
+            _floaters_in_water[i] = false
 
         add_force(force, position)
 
@@ -183,6 +219,18 @@ func is_in_water() -> bool:
     return false
 
 
+func calculate_sub_lvl() -> float:
+    var sl = 0.0
+    for floater in floaters.get_children():
+        var floater_position = (floater as Spatial).global_transform.origin
+        var wave_y = WaveManager.calculate_wave_height(floater_position, 5)
+        var depth = wave_y - floater_position.y
+        if depth > 0:
+            sl += clamp(depth * 0.7, 0.0, 1.0)
+
+    return sl / num_floaters
+
+
 func get_input_direction() -> float:
     return Input.get_action_strength("ui_left") - Input.get_action_strength("ui_right")
 
@@ -190,16 +238,22 @@ func get_input_direction() -> float:
 func update_hud():
     var text = ""
     text += "mspf: %.1f\n" % (1000 / Engine.get_frames_per_second())
-    var xyz = [
-            global_transform.origin.x,
-            global_transform.origin.y,
-            global_transform.origin.z
-        ]
-    text += "x: %.1f, y: %.1f, z: %.1f\n" % xyz
+#    var xyz = [
+#            global_transform.origin.x,
+#            global_transform.origin.y,
+#            global_transform.origin.z
+#        ]
+#    text += "x: %.1f, y: %.1f, z: %.1f\n" % xyz
+    text += "x: %.1f\n" % global_transform.origin.x
+    text += "y: %.1f\n" % global_transform.origin.y
+    text += "z: %.1f\n" % global_transform.origin.z
     text += "speed: %.1f\n" % abs(linear_velocity.length())
-    text += "SOG: %.1f\n" % abs(Vector2(linear_velocity.x, linear_velocity.z).length())
     text += "slope: %.2f\n" % wave_slope()
-    text += "in water: " + str(_is_in_water)
+    text += "in water: " + str(_is_in_water) + "\n"
+    text += "sub lvl: %.2f\n" % _sub_lvl
+    text += "linear damp: %.2f\n" % linear_damp
+    text += "angular damp: %.2f\n" % angular_damp
+
 
     Hud.get_children()[0].text = text
 

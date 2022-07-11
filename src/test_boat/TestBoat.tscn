@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://src/Boat.gd" type="Script" id=1]
 
@@ -18,6 +18,13 @@ size = Vector3( 3.5, 0.6, 0.6 )
 
 [sub_resource type="CubeMesh" id=11]
 size = Vector3( 1.146, 0.012, 2 )
+
+[sub_resource type="SpatialMaterial" id=12]
+params_billboard_mode = 1
+
+[sub_resource type="QuadMesh" id=13]
+material = SubResource( 12 )
+size = Vector2( 0.1, 0.1 )
 
 [node name="TestBoat" type="RigidBody"]
 linear_damp = 1.0
@@ -132,3 +139,36 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -0.5, 0 )
 
 [node name="keel" type="Position3D" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.59082, 0 )
+
+[node name="splashers" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.16569, 0.267355, 0 )
+
+[node name="r" type="CPUParticles" parent="splashers"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0.5 )
+emitting = false
+amount = 16
+one_shot = true
+explosiveness = 0.78
+local_coords = false
+mesh = SubResource( 13 )
+emission_shape = 2
+emission_box_extents = Vector3( 0, 0, 1 )
+direction = Vector3( 1, 1.172, 0 )
+spread = 20.0
+flatness = 0.31
+initial_velocity = 5.0
+
+[node name="l" type="CPUParticles" parent="splashers"]
+transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -0.5 )
+emitting = false
+amount = 16
+one_shot = true
+explosiveness = 0.78
+local_coords = false
+mesh = SubResource( 13 )
+emission_shape = 2
+emission_box_extents = Vector3( 0, 0, 1 )
+direction = Vector3( 1, 1.172, 0 )
+spread = 20.0
+flatness = 0.31
+initial_velocity = 5.0

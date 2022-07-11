@@ -68,9 +68,10 @@ angular_damp = 0.0
 acceleration = 6.0
 surf_boost = 5.0
 steering_rate = 12.0
-displacement_rate = 0.7
+displacement_rate = 0.8
 max_buoyancy = 70.0
 slamming_force = 0.7
+linear_water_resistance = 4.0
 camera_yaw = true
 
 [node name="InterpolatedCamera" type="InterpolatedCamera" parent="."]

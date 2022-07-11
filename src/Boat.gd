@@ -54,6 +54,8 @@ var _is_in_water: bool
 var _was_in_water: bool
 var _sub_lvl: float
 var _floaters_in_water = []
+var _left_splash_submerged: bool
+var _right_splash_submerged: bool
 
 func _ready():
     num_floaters = floaters.get_child_count()
@@ -126,18 +128,27 @@ func _physics_process(_delta):
 
     _was_in_water = _is_in_water
 
+    var splasher = $splashers/l
+    var b = WaveManager.is_object_submerged(splasher)
+    if not _left_splash_submerged and b and splasher.emitting == false:
+        splasher.emitting = true
+
+    _left_splash_submerged = b
+
+    splasher = $splashers/r
+    b = WaveManager.is_object_submerged(splasher)
+    if not _right_splash_submerged and b and splasher.emitting == false:
+        splasher.emitting = true
+
+    _right_splash_submerged = b
+
 
 func move_in_water():
 
     apply_buoyancy()
 
-#    var direction = (bow.global_transform.origin - stern.global_transform.origin).normalized()
     var direction = global_transform.basis.xform(Vector3.RIGHT)
     var slope = wave_slope()
-    # slide with the slope of the waves:
-#    var flow_with_slope = pow(abs(slope), 2) * sign(slope)
-#    add_central_force(global_transform.basis.xform(Vector3.RIGHT * flow_with_slope))
-#    add_central_force(direction * flow_with_slope)
 
     # accelerate
     if Input.is_action_pressed("ui_up"):
@@ -253,7 +264,6 @@ func update_hud():
     text += "sub lvl: %.2f\n" % _sub_lvl
     text += "linear damp: %.2f\n" % linear_damp
     text += "angular damp: %.2f\n" % angular_damp
-
 
     Hud.get_children()[0].text = text
 

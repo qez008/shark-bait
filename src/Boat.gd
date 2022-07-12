@@ -11,15 +11,15 @@ onready var floaters = $floaters
 onready var camera_rotor = $camera_rotor
 
 # Boat variables
-export (float) var acceleration = 3.0
+export (float) var acceleration = 6.0
 export (float) var surf_boost = 5.0
-export (float) var steering_rate = 10.0
+export (float) var steering_rate = 12.0
 
-export (float) var displacement_rate = 1.0
-export (float) var max_buoyancy = 30.0
-export (float) var slamming_force = 1.0
-export (float) var linear_water_resistance = 0.5
-export (float) var angular_water_resistance = 8.0
+export (float) var displacement_rate = 0.8
+export (float) var max_buoyancy = 70.0
+export (float) var slamming_force = 0.7
+export (float) var linear_water_resistance = 4.0
+export (float) var angular_water_resistance = 10.0
 
 
 # Camera export variables:
@@ -54,8 +54,7 @@ var _is_in_water: bool
 var _was_in_water: bool
 var _sub_lvl: float
 var _floaters_in_water = []
-var _left_splash_submerged: bool
-var _right_splash_submerged: bool
+var splashers_submerged: bool
 
 func _ready():
     num_floaters = floaters.get_child_count()
@@ -114,10 +113,6 @@ func _physics_process(_delta):
     _is_in_water = is_in_water()
     _sub_lvl = calculate_sub_lvl()
 
-#    # impact with the water:
-#    if not was_in_water and _is_in_water:
-#        apply_central_impulse(Vector3.UP * abs(linear_velocity.y) * slamming_force)
-
     angular_damp = max(2, _sub_lvl * angular_water_resistance)
     linear_damp = max(1, 1 + _sub_lvl * linear_water_resistance)
 
@@ -128,19 +123,12 @@ func _physics_process(_delta):
 
     _was_in_water = _is_in_water
 
-    var splasher = $splashers/l
-    var b = WaveManager.is_object_submerged(splasher)
-    if not _left_splash_submerged and b and splasher.emitting == false:
-        splasher.emitting = true
+    var b = WaveManager.is_object_submerged($splashers)
+    if not splashers_submerged and b:
+        $splashers/l.emitting = true
+        $splashers/r.emitting = true
 
-    _left_splash_submerged = b
-
-    splasher = $splashers/r
-    b = WaveManager.is_object_submerged(splasher)
-    if not _right_splash_submerged and b and splasher.emitting == false:
-        splasher.emitting = true
-
-    _right_splash_submerged = b
+    splashers_submerged = b
 
 
 func move_in_water():
@@ -182,7 +170,6 @@ func apply_buoyancy():
         var floater_position = floaters.get_child(i).global_transform.origin
         var position = floater_position - global_transform.origin
         var force = Vector3.DOWN * 16 / num_floaters
-#        force = Vector3.ZERO
         var wave_y = WaveManager.calculate_wave_height(floater_position)
 
         var depth = wave_y - floater_position.y
@@ -193,7 +180,6 @@ func apply_buoyancy():
             force += buoyancy_force
             # floater makes impact with water:
             if not _floaters_in_water[i]:
-#            if _is_in_water and not _was_in_water:
                 var impact_force = Vector3.UP * abs(linear_velocity.y) * slamming_force
                 apply_impulse(position, impact_force / num_floaters)
 

@@ -3,7 +3,7 @@
 [ext_resource path="res://src/ocean_test.gd" type="Script" id=1]
 [ext_resource path="res://src/waves.gd" type="Script" id=2]
 [ext_resource path="res://src/utils/mesh_generator/polygon_mesh-1.res" type="ArrayMesh" id=3]
-[ext_resource path="res://src/test_boat/TestBoat.tscn" type="PackedScene" id=4]
+[ext_resource path="res://src/SailBoat.tscn" type="PackedScene" id=4]
 [ext_resource path="res://shaders/large_ocean_surface.gdshader" type="Shader" id=5]
 
 [sub_resource type="ProceduralSky" id=40]
@@ -38,16 +38,17 @@ shader_param/seed = 0.0
 shader_param/y_off = 0.0
 shader_param/line_color = Color( 0.164706, 0.164706, 0.164706, 1 )
 shader_param/fill_color = Color( 0, 0.1, 0.1, 1 )
-shader_param/wave_a = Vector3( 1.6, 70, 0.12 )
-shader_param/wave_b = Vector3( 2, 35, 0.15 )
-shader_param/wave_c = Vector3( 1.2, 20, 0.16 )
-shader_param/wave_d = Vector3( 1.5, 12, 0.2 )
+shader_param/wave_a = Vector3( 1.6, 40, 0.12 )
+shader_param/wave_b = Vector3( 2, 20, 0.098 )
+shader_param/wave_c = Vector3( 1.908, 26.79, -0.07 )
+shader_param/wave_d = Vector3( 1.5, 31.344, 0.058 )
 shader_param/synced_time = 0.0
 shader_param/wave_offset = Vector3( 0, 0, 0 )
 shader_param/mesh_size = 400.0
 
 [node name="ocean_test_4" type="Spatial"]
 script = ExtResource( 1 )
+boat = NodePath("SailBoat")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 41 )
@@ -61,26 +62,16 @@ material/0 = SubResource( 43 )
 script = ExtResource( 2 )
 is_master = true
 
-[node name="TestBoat" parent="." instance=ExtResource( 4 )]
-gravity_scale = 0.0
-linear_damp = 0.0
-angular_damp = 0.0
-acceleration = 6.0
-surf_boost = 5.0
-steering_rate = 12.0
-displacement_rate = 0.8
-max_buoyancy = 70.0
-slamming_force = 0.7
-linear_water_resistance = 4.0
-camera_yaw = true
-
 [node name="InterpolatedCamera" type="InterpolatedCamera" parent="."]
 transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.9123, 1.47195, 0 )
 current = true
 fov = 82.0
 far = 500.0
-target = NodePath("../TestBoat/camera_rotor/camera_target")
+target = NodePath("../SailBoat/camera_rotor/camera_target")
 speed = 2.0
 enabled = true
 
-[editable path="TestBoat"]
+[node name="SailBoat" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19896, 0 )
+
+[editable path="SailBoat"]

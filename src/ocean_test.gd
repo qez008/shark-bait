@@ -3,6 +3,7 @@ extends Spatial
 export (NodePath) var general_surface
 
 onready var camera = $InterpolatedCamera
+export (NodePath) onready var boat = get_node(boat)
 
 func _physics_process(delta):
 
@@ -11,5 +12,5 @@ func _physics_process(delta):
     WaveManager.set_wave_offset(pos.x, pos.z)
 
     Hud.set_compass_angle(camera.rotation.y)
-    Hud.set_needle_angle(camera.rotation.y - $TestBoat.rotation.y + PI / 2)
-    Hud.update_track($TestBoat.global_transform.origin)
+    Hud.set_needle_angle(camera.rotation.y - boat.rotation.y + PI / 2)
+    Hud.update_track(boat.global_transform.origin)

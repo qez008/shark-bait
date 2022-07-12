@@ -28,6 +28,8 @@ var extreme_waves = [
         Vector3(1.508, 12.934, 0.15)
    ]
 
+var init_waves: Array
+
 
 # state:
 
@@ -45,13 +47,6 @@ var _wave_offset: Vector3
 var _is_tweening: bool
 var _target_config: PoolVector3Array
 var _current_config: PoolVector3Array
-var _tween: Tween
-
-
-func _ready():
-    print("Setting up WaveManager..")
-    _tween = Tween.new()
-    add_child(_tween)
 
 
 func _process(delta):
@@ -96,13 +91,16 @@ func compare_floats(a, b, epsilon=0.001) -> bool:
 
 func _unhandled_input(event):
     if event.is_action_pressed("one"):
-        activate_tween(quiet_waves)
+        set_wave_config(quiet_waves)
 
     if event.is_action_pressed("two"):
-        activate_tween(medium_waves)
+        set_wave_config(medium_waves)
 
     if event.is_action_pressed("three"):
-        activate_tween(extreme_waves)
+        set_wave_config(extreme_waves)
+
+    if event.is_action_pressed("zero"):
+        set_wave_config(init_waves)
 
 
 func activate_tween(config):
@@ -180,6 +178,11 @@ func y_relative_to_surface(object: Spatial) -> float:
 
 
 # SETTERS:
+
+func set_initial_wave_config(config):
+    init_waves = config
+    set_wave_config(init_waves)
+
 
 func set_wave_config(config):
     callv("_set_wave_config", config)

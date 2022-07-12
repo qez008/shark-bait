@@ -12,7 +12,7 @@ func _ready():
     var _s2 = WaveManager.connect("update_wave_offset", self, "set_wave_offset")
 
     if is_master:
-        WaveManager.set_wave_config([
+        WaveManager.set_initial_wave_config([
             _shader_mat.get_shader_param("wave_b"),
             _shader_mat.get_shader_param("wave_a"),
             _shader_mat.get_shader_param("wave_c"),

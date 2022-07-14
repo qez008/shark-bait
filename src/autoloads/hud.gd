@@ -36,3 +36,7 @@ func set_compass_angle(a: float):
 
 func set_needle_angle(a: float):
     needle.rotation = a
+
+
+func set_windex_angle(a: float):
+    $compass/windex.rotation = compass.rotation + a

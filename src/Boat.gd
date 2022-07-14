@@ -33,6 +33,8 @@ export (bool) var camera_pitch = false
 export (NodePath) var bow_path
 export (NodePath) var stern_path
 
+export (Curve) var heel_curve: Curve
+
 
 var bow: Spatial
 var stern: Spatial
@@ -56,6 +58,12 @@ var _sub_lvl: float
 var _floaters_in_water = []
 var splashers_submerged: bool
 
+# Sailing variables:
+var _sail_preasure: float
+var _keel_preasure: float
+var _heel: float
+
+
 func _ready():
     num_floaters = floaters.get_child_count()
     for _i in num_floaters:
@@ -76,7 +84,10 @@ func _input(event):
 
     if event.is_action_pressed("flip"):
         transform.origin.y = 10
-        transform.basis = Vector3.ZERO
+        var q = Quat(transform.basis)
+        q.x = 0
+        q.z = 0
+        transform.basis = Basis(q)
 
     # quit
     if event.is_action_pressed("ui_cancel"):
@@ -108,7 +119,7 @@ func _update_rotation(_delta):
 
 
 
-func _physics_process(_delta):
+func _physics_process(delta):
 
     _is_in_water = is_in_water()
     _sub_lvl = calculate_sub_lvl()
@@ -116,7 +127,9 @@ func _physics_process(_delta):
     angular_damp = max(2, _sub_lvl * angular_water_resistance)
     linear_damp = max(1, 1 + _sub_lvl * linear_water_resistance)
 
+
     if _is_in_water:
+        sail_vs_keel(delta)
         move_in_water()
     else:
         move_in_air()
@@ -129,6 +142,27 @@ func _physics_process(_delta):
         $splashers/r.emitting = true
 
     splashers_submerged = b
+
+
+func sail_vs_keel(delta):
+    _heel = Quat(transform.basis).x
+
+    var keel_angle = _heel
+    _keel_preasure = heel_curve.interpolate(abs(_heel)) * -sign(_heel) * 100
+    var keel_force = Vector3.RIGHT * _keel_preasure
+    add_torque(global_transform.basis.xform(keel_force))
+
+    # temporary fix preventing flips..
+    if not is_upright(0.3):
+        return
+
+    var wind = WaveManager.get_wind()
+    # when mast is up right all wind force is applied,
+    # and when mast is sideways no wind force is applied:
+    var x = 1 - abs(_heel)
+    _sail_preasure = x * wind.angle
+    var sail_force = wind.vector * x
+    add_torque(sail_force)
 
 
 func move_in_water():
@@ -153,7 +187,8 @@ func move_in_water():
     var input_direction = get_input_direction()
     # steer
     if input_direction != 0:
-        add_torque(Vector3(0, steering_rate * input_direction * _sub_lvl, 0))
+        var rot = Vector3(0, steering_rate * input_direction * _sub_lvl, 0)
+        add_torque(global_transform.basis.xform(rot))
 
 
 func move_in_air():
@@ -161,7 +196,8 @@ func move_in_air():
     var input_direction = get_input_direction()
     # steer, but in the air:
     if input_direction != 0:
-        add_torque(Vector3(0, steering_rate * input_direction * 0.2, 0))
+        var rot = Vector3(0, steering_rate * input_direction * 0.2, 0)
+        add_torque(global_transform.basis.xform(rot))
 
 
 func apply_buoyancy():
@@ -184,8 +220,6 @@ func apply_buoyancy():
                 apply_impulse(position, impact_force / num_floaters)
 
             _floaters_in_water[i] = true
-
-
 
         else:
             _floaters_in_water[i] = false
@@ -214,6 +248,12 @@ func is_in_water() -> bool:
                 return true
 
     return false
+
+
+func is_upright(treshold=0.5) -> bool:
+    var transform_up = global_transform.basis.y
+    return transform_up.y > treshold
+
 
 
 func calculate_sub_lvl() -> float:
@@ -250,6 +290,9 @@ func update_hud():
     text += "sub lvl: %.2f\n" % _sub_lvl
     text += "linear damp: %.2f\n" % linear_damp
     text += "angular damp: %.2f\n" % angular_damp
+    text += "sail preasure: %.2f\n" % _sail_preasure
+    text += "keel preasure: %.2f\n" % _keel_preasure
+    text += "heel: %.2f\n" % _heel
 
     Hud.get_children()[0].text = text
 

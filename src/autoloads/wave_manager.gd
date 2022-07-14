@@ -3,11 +3,22 @@ extends Node
 signal update_wave_config
 signal update_wave_offset
 
+
+class Wind:
+
+    var angle: float
+    var force: float
+    var vector: Vector3
+
+    func _init(wind_angle: float, wind_force: float):
+        self.angle = wind_angle
+        self.force = wind_force
+        vector = Vector3(cos(angle), 0, sin(angle)) * wind_force
+
+
 # wave configurations:
 
 var quiet_waves = [
-#        Vector3(PI / 2.1, 42.0, 0.08),
-#        Vector3(PI / 2.4, 60.0, 0.07),
         Vector3(1.81, 20.0, 0.1),
         Vector3(1.31, 40.0, 0.1),
         Vector3(0.0, 1.0, 0.0),
@@ -31,6 +42,7 @@ var extreme_waves = [
 var init_waves: Array
 
 
+
 # state:
 
 var _time: float = 0.0
@@ -47,6 +59,9 @@ var _wave_offset: Vector3
 var _is_tweening: bool
 var _target_config: PoolVector3Array
 var _current_config: PoolVector3Array
+
+
+var _wind: Wind = Wind.new(0, 10)
 
 
 func _process(delta):
@@ -209,3 +224,7 @@ func get_wave_time() -> float:
 
 func get_wave_direction() -> Vector3:
     return _general_wave_direction
+
+
+func get_wind() -> Wind:
+    return _wind

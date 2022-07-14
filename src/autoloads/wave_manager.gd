@@ -3,19 +3,6 @@ extends Node
 signal update_wave_config
 signal update_wave_offset
 
-
-class Wind:
-
-    var angle: float
-    var force: float
-    var vector: Vector3
-
-    func _init(wind_angle: float, wind_force: float):
-        self.angle = wind_angle
-        self.force = wind_force
-        vector = Vector3(cos(angle), 0, sin(angle)) * wind_force
-
-
 # wave configurations:
 
 var quiet_waves = [
@@ -61,7 +48,7 @@ var _target_config: PoolVector3Array
 var _current_config: PoolVector3Array
 
 
-var _wind: Wind = Wind.new(0, 10)
+var _wind: Wind = Wind.new(1.61 + PI, 40)
 
 
 func _process(delta):

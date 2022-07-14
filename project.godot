@@ -18,10 +18,16 @@ _global_script_classes=[ {
 "class": "StateMachine",
 "language": "GDScript",
 "path": "res://src/utils/statemachine.gd"
+}, {
+"base": "Reference",
+"class": "Wind",
+"language": "GDScript",
+"path": "res://src/custom_types/Wind.gd"
 } ]
 _global_script_class_icons={
 "Boat": "",
-"StateMachine": ""
+"StateMachine": "",
+"Wind": ""
 }
 
 [application]

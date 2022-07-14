@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://src/ocean_test.gd" type="Script" id=1]
 [ext_resource path="res://src/waves.gd" type="Script" id=2]
 [ext_resource path="res://src/utils/mesh_generator/polygon_mesh-1.res" type="ArrayMesh" id=3]
 [ext_resource path="res://src/SailBoat.tscn" type="PackedScene" id=4]
 [ext_resource path="res://shaders/large_ocean_surface.gdshader" type="Shader" id=5]
+[ext_resource path="res://src/camera_rotor.gd" type="Script" id=6]
 
 [sub_resource type="ProceduralSky" id=40]
 sky_top_color = Color( 0.196078, 0.352941, 0.513726, 1 )
@@ -67,11 +68,23 @@ transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.9123
 current = true
 fov = 82.0
 far = 500.0
-target = NodePath("../SailBoat/camera_rotor/camera_target")
+target = NodePath("../camera_rootor/camera_target")
 speed = 2.0
 enabled = true
 
 [node name="SailBoat" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19896, 0 )
 
-[editable path="SailBoat"]
+[node name="camera_rootor" type="Position3D" parent="."]
+script = ExtResource( 6 )
+camera_yaw = true
+target_node = NodePath("../SailBoat")
+
+[node name="camera_target" type="Position3D" parent="camera_rootor"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 0 )
+
+[node name="right_target" type="Position3D" parent="camera_rootor"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 2.05863 )
+
+[node name="left_target" type="Position3D" parent="camera_rootor"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.117, 4.932, -2.059 )

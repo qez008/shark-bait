@@ -6,10 +6,6 @@ const MS_TO_KNOTS = 1.94384449
 
 enum { IN_WATER, OUT_OF_WATER }
 
-
-onready var floaters = $floaters
-onready var camera_rotor = $camera_rotor
-
 # Boat variables
 export (float) var acceleration = 6.0
 export (float) var surf_boost = 5.0
@@ -22,30 +18,16 @@ export (float) var linear_water_resistance = 4.0
 export (float) var angular_water_resistance = 10.0
 
 
-# Camera export variables:
-export (float, 0.0, 1.0) var sensitivity = 0.5
-export (float, 0.0, 0.999, 0.001) var smoothness = 0.5 setget set_smoothness
-export (int, 0, 360) var yaw_limit = 360
-export (int, 0, 360) var pitch_limit = 360
-export (bool) var camera_yaw = false
-export (bool) var camera_pitch = false
-
 export (NodePath) var bow_path
 export (NodePath) var stern_path
 
 export (Curve) var heel_curve: Curve
 
+onready var floaters = $floaters
+
 
 var bow: Spatial
 var stern: Spatial
-
-# Internal camera variables:
-var _mouse_offset = Vector2()
-var _rotation_offset = Vector2()
-var _yaw = 0.0
-var _total_yaw = 0.0
-var _pitch = 0.0
-var _total_pitch = 0.0
 
 var num_floaters: int
 var state = IN_WATER
@@ -72,16 +54,8 @@ func _ready():
     bow = get_node(bow_path)
     stern = get_node(stern_path)
 
-    $camera_rotor/camera_target.transform.origin = $camera_rotor/right_target.transform.origin
-
-    if camera_pitch or camera_yaw:
-        Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
 
 func _input(event):
-    if event is InputEventMouseMotion:
-        _mouse_offset = event.relative
-
     if event.is_action_pressed("flip"):
         transform.origin.y = 10
         var q = Quat(transform.basis)
@@ -95,28 +69,7 @@ func _input(event):
 
 
 func _process(delta):
-    _update_rotation(delta)
     update_hud()
-
-
-func _update_rotation(_delta):
-    var offset = _mouse_offset * sensitivity
-    _mouse_offset = Vector2()
-
-    if camera_yaw:
-        _yaw = _yaw * smoothness + offset.x * (1.0 - smoothness)
-        if yaw_limit < 360:
-            _yaw = clamp(_yaw, -yaw_limit - _total_yaw, yaw_limit - _total_yaw)
-        _total_yaw += _yaw
-        camera_rotor.rotate_y(deg2rad(-_yaw))
-
-    if camera_pitch:
-        _pitch = _pitch * smoothness + offset.y * (1.0 - smoothness)
-        if pitch_limit < 360:
-            _pitch = clamp(_pitch, -pitch_limit - _total_pitch, pitch_limit - _total_pitch)
-        _total_pitch += _pitch
-        camera_rotor.rotate_object_local(Vector3(1,0,0), deg2rad(-_pitch))
-
 
 
 func _physics_process(delta):
@@ -282,12 +235,6 @@ func get_input_direction() -> float:
 func update_hud():
     var text = ""
     text += "mspf: %.1f\n" % (1000 / Engine.get_frames_per_second())
-#    var xyz = [
-#            global_transform.origin.x,
-#            global_transform.origin.y,
-#            global_transform.origin.z
-#        ]
-#    text += "x: %.1f, y: %.1f, z: %.1f\n" % xyz
     text += "x: %.1f\n" % global_transform.origin.x
     text += "y: %.1f\n" % global_transform.origin.y
     text += "z: %.1f\n" % global_transform.origin.z
@@ -302,14 +249,6 @@ func update_hud():
     text += "heel: %.2f\n" % _heel
     text += "wind angle: %.2f\n" % WaveManager.get_wind().angle
     text += "relative wind angle: %.2f\n" % relative_wind_angle()
-#    text += str(global_transform.basis.x) + "\n"
-#    text += str(global_transform.basis.y) + "\n"
-#    text += str(global_transform.basis.z) + "\n"
-
 
     Hud.get_children()[0].text = text
-
-
-func set_smoothness(value):
-    smoothness = clamp(value, 0.001, 0.999)
 

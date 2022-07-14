@@ -48,7 +48,7 @@ var _target_config: PoolVector3Array
 var _current_config: PoolVector3Array
 
 
-var _wind: Wind = Wind.new(1.61 + PI, 40)
+var _wind: Wind = Wind.new(1.61 + PI, 20)
 
 
 func _process(delta):

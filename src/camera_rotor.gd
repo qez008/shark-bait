@@ -20,11 +20,15 @@ var _pitch = 0.0
 var _total_pitch = 0.0
 
 var _look_left: bool = false
+var _initial_y: float
+
 
 func _ready():
     toggle_camera_target()
     if camera_pitch or camera_yaw:
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+    _initial_y = $camera_target.global_transform.origin.y
 
 
 func _input(event):
@@ -40,6 +44,9 @@ func _process(delta):
 
     var target_transform = (target_node as Spatial).global_transform
     global_transform.origin = target_transform.origin
+
+#    var wave_y = WaveManager.calculate_wave_height($camera_target.global_transform.origin)
+#    $camera_target.transform.origin.y = max(wave_y + 10, _initial_y)
 
     var v = target_transform.basis.x
     v = Vector3(v.x, 0, v.z).normalized().rotated(Vector3.UP, deg2rad(-_total_yaw))

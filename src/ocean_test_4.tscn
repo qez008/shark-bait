@@ -1,93 +1,62 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=10 format=3 uid="uid://cu5dcud24nhwd"]
 
-[ext_resource path="res://src/ocean_test.gd" type="Script" id=1]
-[ext_resource path="res://src/waves.gd" type="Script" id=2]
-[ext_resource path="res://src/utils/mesh_generator/polygon_mesh-1.res" type="ArrayMesh" id=3]
-[ext_resource path="res://src/SailBoat.tscn" type="PackedScene" id=4]
-[ext_resource path="res://shaders/large_ocean_surface.gdshader" type="Shader" id=5]
-[ext_resource path="res://src/camera_rotor.gd" type="Script" id=6]
+[ext_resource type="Script" path="res://src/ocean_test.gd" id="1"]
+[ext_resource type="Script" path="res://src/waves.gd" id="2"]
+[ext_resource type="ArrayMesh" uid="uid://djd1vshxqmufs" path="res://src/utils/mesh_generator/polygon_mesh-1.res" id="3"]
+[ext_resource type="PackedScene" uid="uid://dm7ijtt641f2u" path="res://src/SailBoat.tscn" id="4"]
+[ext_resource type="Script" path="res://src/InterpolatedCamera.gd" id="4_r70pj"]
+[ext_resource type="Script" path="res://src/camera_rotor.gd" id="6"]
 
-[sub_resource type="ProceduralSky" id=44]
-sky_top_color = Color( 0.45098, 0.529412, 0.568627, 1 )
-sky_horizon_color = Color( 0.552941, 0.615686, 0.666667, 1 )
-ground_bottom_color = Color( 0.552941, 0.615686, 0.666667, 1 )
-ground_horizon_color = Color( 0.552941, 0.615686, 0.666667, 1 )
-sun_latitude = 90.0
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_78osh"]
+sky_horizon_color = Color(0.647059, 0.654902, 0.670588, 1)
+ground_bottom_color = Color(0.647059, 0.654902, 0.670588, 1)
+ground_horizon_color = Color(0.647059, 0.654902, 0.670588, 1)
 
-[sub_resource type="Environment" id=45]
+[sub_resource type="Sky" id="Sky_y84yr"]
+sky_material = SubResource("ProceduralSkyMaterial_78osh")
+
+[sub_resource type="Environment" id="Environment_6hn8f"]
 background_mode = 2
-background_sky = SubResource( 44 )
-background_color = Color( 0.960784, 0.286275, 0.286275, 1 )
-fog_enabled = true
-fog_color = Color( 0.552941, 0.615686, 0.666667, 1 )
-fog_depth_begin = 5.0
-ss_reflections_depth_tolerance = 1.0
-ssao_radius = 14.09
-ssao_intensity = 18.27
-dof_blur_far_distance = 40.0
-glow_bloom = 0.12
-adjustment_enabled = true
-adjustment_brightness = 0.2
-adjustment_contrast = 0.9
-adjustment_saturation = 0.6
+sky = SubResource("Sky_y84yr")
+ambient_light_source = 3
+reflected_light_source = 2
 
-[sub_resource type="ShaderMaterial" id=43]
-shader = ExtResource( 5 )
-shader_param/NUM_OCTAVES = 3
-shader_param/num_lines = 8.0
-shader_param/line_width = 0.1
-shader_param/noise_scale = 400.0
-shader_param/treshold = 0.158
-shader_param/seed = 0.0
-shader_param/y_off = 0.0
-shader_param/line_color = Color( 0.164706, 0.164706, 0.164706, 1 )
-shader_param/fill_color = Color( 0, 0.1, 0.1, 1 )
-shader_param/wave_a = Vector3( 1.6, 40, 0.12 )
-shader_param/wave_b = Vector3( 2, 20, 0.098 )
-shader_param/wave_c = Vector3( 1.908, 26.79, -0.07 )
-shader_param/wave_d = Vector3( 1.5, 31.344, 0.058 )
-shader_param/synced_time = 0.0
-shader_param/wave_offset = Vector3( 0, 0, 0 )
-shader_param/mesh_size = 400.0
-
-[node name="ocean_test_4" type="Spatial"]
-script = ExtResource( 1 )
-boat = NodePath("SailBoat")
+[node name="ocean_test_4" type="Node3D"]
+script = ExtResource("1")
+boat_path = NodePath("SailBoat")
 
 [node name="env2" type="WorldEnvironment" parent="."]
-environment = SubResource( 45 )
+environment = SubResource("Environment_6hn8f")
 
-[node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( -0.972922, -0.216235, 0.0816478, 0, 0.353246, 0.935531, -0.231136, 0.910198, -0.343681, 1.41072, 8.28774, 0 )
+[node name="DirectionalLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.816007, -0.373725, -0.440979, -0.52982, 0.178519, 0.829109, -0.231136, 0.910198, -0.34368, -2.41206, 8.28774, 16.0721)
 
-[node name="surface" type="MeshInstance" parent="."]
-mesh = ExtResource( 3 )
-material/0 = SubResource( 43 )
-script = ExtResource( 2 )
+[node name="surface" type="MeshInstance3D" parent="."]
+mesh = ExtResource("3")
+script = ExtResource("2")
 is_master = true
 
-[node name="InterpolatedCamera" type="InterpolatedCamera" parent="."]
-transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.9123, 1.47195, 0 )
+[node name="InterpolatedCamera" type="Camera3D" parent="." node_paths=PackedStringArray("target_node")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.9123, 1.47195, 0)
 current = true
 fov = 82.0
 far = 500.0
-target = NodePath("../camera_rootor/camera_target")
-speed = 2.0
-enabled = true
+script = ExtResource("4_r70pj")
+target_node = NodePath("../camera_rootor/camera_target")
 
-[node name="SailBoat" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19896, 0 )
+[node name="SailBoat" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19896, 0)
 
-[node name="camera_rootor" type="Position3D" parent="."]
-script = ExtResource( 6 )
+[node name="camera_rootor" type="Position3D" parent="." node_paths=PackedStringArray("target_node")]
+script = ExtResource("6")
 camera_yaw = true
-target_node = NodePath("../SailBoat")
+target_node = NodePath("camera_target")
 
 [node name="camera_target" type="Position3D" parent="camera_rootor"]
-transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 0 )
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 0)
 
 [node name="right_target" type="Position3D" parent="camera_rootor"]
-transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 2.05863 )
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.1171, 4.93198, 2.05863)
 
 [node name="left_target" type="Position3D" parent="camera_rootor"]
-transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.117, 4.932, -2.059 )
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.117, 4.932, -2.059)

@@ -1,5 +1,5 @@
 shader_type spatial;
-//render_mode ;
+render_mode cull_back;
 
 uniform int NUM_OCTAVES = 3;
 uniform float num_lines = 30.0;
@@ -11,8 +11,8 @@ uniform float seed = 0.0;
 
 uniform float y_off = 0.0;
 
-uniform vec4 line_color : hint_color = vec4(0.0, 0.7, 1.0, 1.0);
-uniform vec4 fill_color : hint_color = vec4(0.0, 0.1, 0.1, 1.0);
+uniform vec4 line_color : source_color = vec4(0.0, 0.7, 1.0, 1.0);
+uniform vec4 fill_color : source_color = vec4(0.0, 0.1, 0.1, 1.0);
 
 // angle, speed, wave length, steepness:
 uniform vec3 wave_a = vec3(0., 1., 0.);
@@ -24,9 +24,6 @@ uniform float synced_time = 0.0;
 uniform vec3 wave_offset = vec3(0.0, 0.0, 0.0);
 
 uniform float mesh_size = 40.;
-
-
-const float PI = 3.141593;
 
 
 /*
@@ -161,11 +158,11 @@ void fragment() {
         ALBEDO += surface_pattern(dist, UV, t);// * normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
     }
     
-    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    NORMAL = normalize(cross(-dFdx(VERTEX), dFdy(VERTEX)));
 //    ALBEDO = fill_color.rgb;
     METALLIC = 0.0;
-    ROUGHNESS = 0.3;
-    SPECULAR = 0.1;
+    ROUGHNESS = 0.0;
+//    SPECULAR = 0.1;
     
 //    ALPHA = clamp(1. - pow(dist * 2., 2), 0., 1.);
 //    float depth;

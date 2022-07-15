@@ -21,12 +21,12 @@ background_color = Color( 0.960784, 0.286275, 0.286275, 1 )
 fog_enabled = true
 fog_color = Color( 0.552941, 0.615686, 0.666667, 1 )
 fog_depth_begin = 5.0
+ss_reflections_enabled = true
 ss_reflections_depth_tolerance = 1.0
 ssao_radius = 14.09
 ssao_intensity = 18.27
 dof_blur_far_distance = 40.0
 glow_bloom = 0.12
-adjustment_enabled = true
 adjustment_brightness = 0.2
 adjustment_contrast = 0.9
 adjustment_saturation = 0.6
@@ -58,7 +58,7 @@ boat = NodePath("SailBoat")
 environment = SubResource( 45 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( -0.972922, -0.216235, 0.0816478, 0, 0.353246, 0.935531, -0.231136, 0.910198, -0.343681, 1.41072, 8.28774, 0 )
+transform = Transform( -0.786932, -0.0144739, 0.616871, 0.488758, 0.595602, 0.637475, -0.376636, 0.803149, -0.461624, 1.41072, 8.28774, 0 )
 
 [node name="surface" type="MeshInstance" parent="."]
 mesh = ExtResource( 3 )

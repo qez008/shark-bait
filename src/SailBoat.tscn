@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://src/Boat.gd" type="Script" id=1]
 [ext_resource path="res://assets/models/Material.material" type="Material" id=2]
@@ -30,6 +30,43 @@ surfaces/0 = {
 "skeleton_aabb": [  ],
 "vertex_count": 281
 }
+
+[sub_resource type="Shader" id=17]
+code = "shader_type spatial;
+render_mode cull_disabled;
+
+const float shade = 0.001;
+
+uniform float reflection = 0.1;
+uniform float scale_control = 4.1;
+
+
+void fragment(){
+	float scale = scale_control * 50.0;
+	
+	float y = UV.y * scale;
+	float x = UV.x * scale;
+	int surface = int( float(int(y)) / (2.0/5.0) +x ) % 2;
+	
+	ALBEDO = vec3(shade, shade, shade);
+	ROUGHNESS = 0.65;
+	METALLIC = 0.75;
+	
+//	if (surface == 1) {
+		NORMALMAP = vec3(sin(UV.x*scale*reflection*0.1), 1.0, 1.0);
+//	} else {
+//		NORMALMAP = vec3(cos(UV.y*scale*reflection*0.1), 1.0, 1.0);
+//	}
+}"
+
+[sub_resource type="ShaderMaterial" id=18]
+shader = SubResource( 17 )
+shader_param/reflection = 0.1
+shader_param/scale_control = 4.1
+
+[sub_resource type="QuadMesh" id=16]
+material = SubResource( 18 )
+size = Vector2( 6.832, 10 )
 
 [node name="SailBoat" type="RigidBody"]
 gravity_scale = 0.0
@@ -132,4 +169,9 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.102664, 1.083 )
 [node name="Cube" type="MeshInstance" parent="."]
 transform = Transform( -1.85803e-08, 0, 0.425067, 0, 0.425067, 0, -0.425067, 0, -1.85803e-08, 0, 0.438519, 0 )
 mesh = SubResource( 3 )
+material/0 = null
+
+[node name="sail" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.34472, 0 )
+mesh = SubResource( 16 )
 material/0 = null

@@ -38,7 +38,6 @@ var _is_in_water: bool
 var _was_in_water: bool
 var _sub_lvl: float
 var _floaters_in_water = []
-var splashers_submerged: bool
 
 # Sailing variables:
 var _sail_preasure: float
@@ -92,13 +91,6 @@ func _physics_process(delta):
         move_in_air()
 
     _was_in_water = _is_in_water
-
-    var b = WaveManager.is_object_submerged($splashers)
-    if not splashers_submerged and b:
-        $splashers/l.emitting = true
-        $splashers/r.emitting = true
-
-    splashers_submerged = b
 
 
 

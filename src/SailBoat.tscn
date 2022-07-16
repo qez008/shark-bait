@@ -1,12 +1,32 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://src/Boat.gd" type="Script" id=1]
 [ext_resource path="res://assets/models/Material.material" type="Material" id=2]
+[ext_resource path="res://src/water_plow.gd" type="Script" id=3]
+[ext_resource path="res://src/splashers.gd" type="Script" id=4]
 
 [sub_resource type="Curve" id=14]
 _data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.680365, 0.223684 ), 0.625459, 0.625459, 0, 0, Vector2( 1, 1 ), 3.95126, 0.0, 0, 0 ]
 
+[sub_resource type="SpatialMaterial" id=19]
+flags_unshaded = true
+params_billboard_mode = 1
+
+[sub_resource type="QuadMesh" id=20]
+material = SubResource( 19 )
+size = Vector2( 0.1, 0.1 )
+
+[sub_resource type="SpatialMaterial" id=21]
+flags_unshaded = true
+albedo_color = Color( 0.807843, 0.0666667, 0.67451, 1 )
+
+[sub_resource type="SphereMesh" id=22]
+material = SubResource( 21 )
+radius = 0.1
+height = 0.2
+
 [sub_resource type="SpatialMaterial" id=12]
+flags_unshaded = true
 params_billboard_mode = 1
 
 [sub_resource type="QuadMesh" id=13]
@@ -79,8 +99,30 @@ bow_path = NodePath("floaters/1")
 stern_path = NodePath("floaters/6")
 heel_curve = SubResource( 14 )
 
+[node name="water_plow" type="Spatial" parent="."]
+transform = Transform( 0.999526, -0.0307827, 0, 0.0307827, 0.999526, 0, 0, 0, 1, 4.90216, 0, 0 )
+script = ExtResource( 3 )
+
+[node name="CPUParticles" type="CPUParticles" parent="water_plow"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0385351, 1.25125, 0 )
+emitting = false
+amount = 32
+lifetime = 0.5
+local_coords = false
+mesh = SubResource( 20 )
+direction = Vector3( 1, 1, 0 )
+initial_velocity = 3.2
+
+[node name="debug_sphere" type="MeshInstance" parent="water_plow/CPUParticles"]
+mesh = SubResource( 22 )
+material/0 = null
+
+[node name="top" type="Position3D" parent="water_plow"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0342145, 0.846495, 0 )
+
 [node name="splashers" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.53947, 0.267355, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.53947, -0.0531881, 0 )
+script = ExtResource( 4 )
 
 [node name="r" type="CPUParticles" parent="splashers"]
 transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0.5 )

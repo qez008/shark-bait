@@ -1,11 +1,12 @@
 extends Spatial
+# larger splash effect when a vessel makes impact with water surface
 
-var splashers_submerged: bool
+var was_submerged: bool
 
 func _physics_process(delta):
-    var b = WaveManager.is_object_submerged(self)
-    if not splashers_submerged and b:
+    var is_submerged = WaveManager.is_object_submerged(self)
+    if not was_submerged and is_submerged:
         $l.emitting = true
         $r.emitting = true
 
-    splashers_submerged = b
+    was_submerged = is_submerged

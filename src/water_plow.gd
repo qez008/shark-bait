@@ -1,15 +1,19 @@
 extends Spatial
+# water plow effect at the front of a vessel
 
 onready var top = $top
 onready var particles = $CPUParticles
+onready var debug_sphere = $CPUParticles/debug_sphere
 
 
 func _physics_process(_delta):
     if WaveManager.is_object_submerged(self) and not WaveManager.is_object_submerged(top):
         particles.emitting = true
         particles.global_transform.origin = calculate_particle_position(top, self)
+        debug_sphere.visible = true
     else:
         particles.emitting = false
+        debug_sphere.visible = false
 
 
 func calculate_particle_position(top_node: Spatial, buttom_node: Spatial) -> Vector3:

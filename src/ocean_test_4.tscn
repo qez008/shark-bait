@@ -21,7 +21,6 @@ background_color = Color( 0.960784, 0.286275, 0.286275, 1 )
 fog_enabled = true
 fog_color = Color( 0.552941, 0.615686, 0.666667, 1 )
 fog_depth_begin = 5.0
-ss_reflections_enabled = true
 ss_reflections_depth_tolerance = 1.0
 ssao_radius = 14.09
 ssao_intensity = 18.27

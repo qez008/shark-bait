@@ -23,7 +23,6 @@ func _physics_process(delta):
     Hud.set_windex_angle(WaveManager.get_wind().angle)
 
 
-
 func _process(_delta):
     var wave_y = WaveManager.calculate_wave_height(camera.global_transform.origin) + 0.2
     if camera.global_transform.origin.y < wave_y:

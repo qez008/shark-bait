@@ -1,8 +1,8 @@
 [gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://shaders/gertsnerwaves.gdshader" type="Shader" id=1]
-[ext_resource path="res://src/waves.gd" type="Script" id=4]
-[ext_resource path="res://src/floater.gd" type="Script" id=5]
+[ext_resource path="res://src/water_physics/ocean_surface.gd" type="Script" id=4]
+[ext_resource path="res://src/water_physics/floater.gd" type="Script" id=5]
 [ext_resource path="res://shaders/detailed_water_surface.gdshader" type="Shader" id=6]
 
 [sub_resource type="ProceduralSky" id=40]

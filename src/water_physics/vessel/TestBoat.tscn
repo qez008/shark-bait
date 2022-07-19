@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://src/vessel/Boat.gd" type="Script" id=1]
+[ext_resource path="res://src/water_physics/vessel/Boat.gd" type="Script" id=1]
 [ext_resource path="res://assets/models/Material.material" type="Material" id=2]
 
 [sub_resource type="BoxShape" id=7]

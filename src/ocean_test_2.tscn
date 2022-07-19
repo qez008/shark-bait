@@ -1,9 +1,9 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://shaders/large_ocean_surface.gdshader" type="Shader" id=1]
-[ext_resource path="res://src/ocean_test.gd" type="Script" id=2]
-[ext_resource path="res://src/vessel/TestBoat.tscn" type="PackedScene" id=3]
-[ext_resource path="res://src/waves.gd" type="Script" id=4]
+[ext_resource path="res://src/water_physics/ocean_scene.gd" type="Script" id=2]
+[ext_resource path="res://src/water_physics/vessel/TestBoat.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/water_physics/ocean_surface.gd" type="Script" id=4]
 
 [sub_resource type="ProceduralSky" id=43]
 sky_top_color = Color( 0.0862745, 0.309804, 0.545098, 1 )

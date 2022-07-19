@@ -1,10 +1,10 @@
 [gd_scene load_steps=18 format=2]
 
-[ext_resource path="res://src/Boat.gd" type="Script" id=1]
+[ext_resource path="res://src/vessel/Boat.gd" type="Script" id=1]
 [ext_resource path="res://assets/models/Material.material" type="Material" id=2]
-[ext_resource path="res://src/water_plow.gd" type="Script" id=3]
-[ext_resource path="res://src/splashers.gd" type="Script" id=4]
-[ext_resource path="res://src/sail_rotor.gd" type="Script" id=5]
+[ext_resource path="res://src/vessel/wfx/water_plow.gd" type="Script" id=3]
+[ext_resource path="res://src/vessel/wfx/splashers.gd" type="Script" id=4]
+[ext_resource path="res://src/vessel/sail_rotor.gd" type="Script" id=5]
 
 [sub_resource type="Curve" id=14]
 _data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.680365, 0.223684 ), 0.625459, 0.625459, 0, 0, Vector2( 1, 1 ), 3.95126, 0.0, 0, 0 ]

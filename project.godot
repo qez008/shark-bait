@@ -9,10 +9,10 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "RigidBody",
+"base": "Reference",
 "class": "Boat",
 "language": "GDScript",
-"path": "res://src/Boat.gd"
+"path": "res://src/vessel/Boat.gd"
 }, {
 "base": "Node",
 "class": "StateMachine",

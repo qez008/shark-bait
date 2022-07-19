@@ -2,7 +2,7 @@
 
 [ext_resource path="res://shaders/large_ocean_surface.gdshader" type="Shader" id=1]
 [ext_resource path="res://src/ocean_test.gd" type="Script" id=2]
-[ext_resource path="res://src/test_boat/TestBoat.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/vessel/TestBoat.tscn" type="PackedScene" id=3]
 [ext_resource path="res://src/waves.gd" type="Script" id=4]
 
 [sub_resource type="ProceduralSky" id=43]
